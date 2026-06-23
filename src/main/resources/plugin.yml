@@ -1,0 +1,17 @@
+name: KittySnap
+version: '${version}'
+
+main: org.icarus.kittySnap.KittySnap
+api-version: '1.21'
+
+commands:
+  kittysnap:
+    description: KittySnap 插件主命令
+    aliases: [ks, bot]
+    usage: /<command> <subcommand> [args]
+    permission: kittysnap.admin
+
+permissions:
+  kittysnap.admin:
+    description: 允许使用 KittySnap 所有命令
+    default: op
