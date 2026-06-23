@@ -1,4 +1,4 @@
-package org.icarus.kittySnap.NapcatApi;
+package org.icarus.kittySnap.napcat;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;

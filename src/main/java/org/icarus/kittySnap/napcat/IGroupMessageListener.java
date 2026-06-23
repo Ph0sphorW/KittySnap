@@ -1,4 +1,4 @@
-package org.icarus.kittySnap.NapcatApi;
+package org.icarus.kittySnap.napcat;
 
 /**
  * 群消息监听器接口

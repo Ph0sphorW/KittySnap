@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.icarus.kittySnap.NapcatApi.NapcatWebSocketClient;
+import org.icarus.kittySnap.napcat.NapcatWebSocketClient;
 import org.icarus.kittySnap.chat.ChatToGroupForwarder;
 import org.icarus.kittySnap.chat.QQToGameBroadcaster;
 import org.icarus.kittySnap.command.KittySnapCommand;

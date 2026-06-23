@@ -5,8 +5,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.icarus.kittySnap.NapcatApi.IGroupMessageListener;
-import org.icarus.kittySnap.NapcatApi.NapcatMessage;
+import org.icarus.kittySnap.napcat.IGroupMessageListener;
+import org.icarus.kittySnap.napcat.NapcatMessage;
 import org.icarus.kittySnap.config.ConfigurationManager;
 
 /**
