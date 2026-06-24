@@ -1,4 +1,4 @@
-package org.icarus.kittySnap.chat;
+package org.icarus.kittysnap.chat;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.icarus.kittySnap.napcat.NapcatWebSocketClient;
-import org.icarus.kittySnap.config.ConfigurationManager;
+import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
+import org.icarus.kittysnap.config.ConfigurationManager;
 
 import java.util.List;
 import java.util.Set;

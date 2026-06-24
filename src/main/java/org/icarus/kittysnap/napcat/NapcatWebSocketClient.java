@@ -1,4 +1,4 @@
-package org.icarus.kittySnap.napcat;
+package org.icarus.kittysnap.napcat;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.icarus.kittySnap.config.ConfigurationManager;
-import org.icarus.kittySnap.database.DatabaseManager;
+import org.icarus.kittysnap.config.ConfigurationManager;
+import org.icarus.kittysnap.database.DatabaseManager;
 
 import java.net.URI;
 import java.net.http.HttpClient;

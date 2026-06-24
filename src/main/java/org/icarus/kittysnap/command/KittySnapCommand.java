@@ -1,12 +1,12 @@
-package org.icarus.kittySnap.command;
+package org.icarus.kittysnap.command;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.util.StringUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.icarus.kittySnap.KittySnap;
-import org.icarus.kittySnap.config.ConfigurationManager;
+import org.icarus.kittysnap.KittySnap;
+import org.icarus.kittysnap.config.ConfigurationManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;

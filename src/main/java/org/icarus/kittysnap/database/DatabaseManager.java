@@ -1,10 +1,10 @@
-package org.icarus.kittySnap.database;
+package org.icarus.kittysnap.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Setter;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.icarus.kittySnap.config.ConfigurationManager;
+import org.icarus.kittysnap.config.ConfigurationManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

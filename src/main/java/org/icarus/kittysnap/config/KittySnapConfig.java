@@ -1,4 +1,4 @@
-package org.icarus.kittySnap.config;
+package org.icarus.kittysnap.config;
 
 import de.exlll.configlib.Comment;
 import de.exlll.configlib.Configuration;

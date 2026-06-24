@@ -1,16 +1,16 @@
-package org.icarus.kittySnap;
+package org.icarus.kittysnap;
 
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.icarus.kittySnap.napcat.NapcatWebSocketClient;
-import org.icarus.kittySnap.chat.ChatToGroupForwarder;
-import org.icarus.kittySnap.chat.QQToGameBroadcaster;
-import org.icarus.kittySnap.command.KittySnapCommand;
-import org.icarus.kittySnap.config.ConfigurationManager;
-import org.icarus.kittySnap.database.DatabaseManager;
+import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
+import org.icarus.kittysnap.chat.ChatToGroupForwarder;
+import org.icarus.kittysnap.chat.QQToGameBroadcaster;
+import org.icarus.kittysnap.command.KittySnapCommand;
+import org.icarus.kittysnap.config.ConfigurationManager;
+import org.icarus.kittysnap.database.DatabaseManager;
 
 import java.util.function.BiConsumer;
 

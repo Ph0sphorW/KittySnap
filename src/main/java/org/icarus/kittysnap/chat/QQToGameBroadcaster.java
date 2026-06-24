@@ -1,13 +1,13 @@
-package org.icarus.kittySnap.chat;
+package org.icarus.kittysnap.chat;
 
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.icarus.kittySnap.napcat.IGroupMessageListener;
-import org.icarus.kittySnap.napcat.NapcatMessage;
-import org.icarus.kittySnap.config.ConfigurationManager;
+import org.icarus.kittysnap.napcat.IGroupMessageListener;
+import org.icarus.kittysnap.napcat.NapcatMessage;
+import org.icarus.kittysnap.config.ConfigurationManager;
 
 /**
  * QQ 群消息 → 游戏内 广播器

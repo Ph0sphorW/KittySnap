@@ -1,4 +1,4 @@
-package org.icarus.kittySnap.napcat;
+package org.icarus.kittysnap.napcat;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
