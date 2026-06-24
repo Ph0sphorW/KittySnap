@@ -84,7 +84,7 @@ public final class KittySnap extends JavaPlugin {
 
         napcatClient = new NapcatWebSocketClient(this, configManager);
 
-        databaseManager = new DatabaseManager(this, configManager);
+        databaseManager = new DatabaseManager(configManager);
         databaseManager.init();
         napcatClient.setDatabaseManager(databaseManager);
 
