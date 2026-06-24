@@ -14,29 +14,29 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-/**
- * 群消息发送 + Napcat 同步 API 调用
- * <p>
- * 持有 WebSocket 引用和待发送/待响应队列，提供发送和查询能力。
- */
 public class MessageSender {
 
     private final ConfigurationManager cfg;
     private final Queue<PendingMessage> pendingQueue = new ConcurrentLinkedQueue<>();
-    private final ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls;
     private final Supplier<Boolean> connected;
     private final Supplier<WebSocket> webSocket;
     private final Supplier<ExecutorService> executor;
 
-    public MessageSender(ConfigurationManager cfg, Supplier<Boolean> connected,
+    public MessageSender(ConfigurationManager cfg,
+                         ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls,
+                         Supplier<Boolean> connected,
                          Supplier<WebSocket> webSocket, Supplier<ExecutorService> executor) {
         this.cfg = cfg;
+        this.pendingApiCalls = pendingApiCalls;
         this.connected = connected;
         this.webSocket = webSocket;
         this.executor = executor;
     }
 
-    /** 发送群消息（未连接则排队） */
+    /**
+     * 发送群消息，未连接则排队
+     */
     public void sendGroupMessage(long groupId, String message) {
         if (connected.get() && webSocket.get() != null) {
             executor.get().execute(() -> doSend(groupId, message));
@@ -68,7 +68,9 @@ public class MessageSender {
                 });
     }
 
-    /** 发送积压的待发消息 */
+    /**
+     * 一并发送积压的待发消息
+     */
     public void flushPending() {
         PendingMessage pm;
         while ((pm = pendingQueue.poll()) != null) {
@@ -76,7 +78,9 @@ public class MessageSender {
         }
     }
 
-    /** 同步 API 调用，等待带 echo 的响应 */
+    /**
+     * 同步 API 调用等待响应
+     */
     public JSONObject sendActionSync(String action, JSONObject params, long timeout) {
         WebSocket ws = webSocket.get();
         if (!connected.get() || ws == null) return null;
@@ -98,7 +102,9 @@ public class MessageSender {
         }
     }
 
-    /** 查询群成员群名片/昵称 */
+    /**
+     * 查询群成员群名片 / 昵称
+     */
     public String queryGroupMemberName(long groupId, long userId) {
         JSONObject params = new JSONObject();
         params.put("group_id", groupId);

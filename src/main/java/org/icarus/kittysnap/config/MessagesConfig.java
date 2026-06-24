@@ -15,17 +15,17 @@ public final class MessagesConfig {
 
     public MessagesConfig() {}
 
-    // ==================== 通用 ====================
+    // -------------------- 通用 --------------------
 
     public String prefix = "[KittySnap]";
 
-    // ==================== 插件生命周期 ====================
+    // -------------------- 插件 --------------------
 
     public String pluginEnabled = "<green>KittySnap 插件已启动";
     public String pluginDisabled = "<red>KittySnap 插件已关闭";
     public String configReloaded = "<green>配置文件与语言文件已重载";
 
-    // ==================== WebSocket 连接 ====================
+    // -------------------- WebSocket 连接 --------------------
 
     public String wsConnecting = "正在连接到 Napcat WebSocket: %s";
     public String wsConnected = "<green>✔ Napcat WebSocket 已连接: %s";
@@ -41,20 +41,20 @@ public final class MessagesConfig {
     public String wsHeartbeatTimeout = "<yellow>心跳超时: 已过 %d 秒（阈值 %d 秒），触发重连";
     public String wsSendFailed = "<red>发送消息到群 %d 失败: %s";
 
-    // ==================== 群监听 ====================
+    // -------------------- 群监听 --------------------
 
     public String groupListenerAdded = "已添加群 %d 的消息监听";
     public String groupListenerRemoved = "已移除群 %d 的消息监听";
     public String listenerError = "群消息监听器执行出错 [群=%d | 用户=%s]";
     public String unhandledGroupMsg = "收到未监听的群消息: %d";
 
-    // ==================== 聊天转发 ====================
+    // -------------------- 聊天转发 --------------------
 
     public String chatForwardEnabled = "<green>游戏聊天 → QQ群 转发已启用";
     public String chatForwardDisabled = "<yellow>游戏聊天 → QQ群 转发已禁用";
     public String chatForwarded = "已转发聊天到群: %s | %s";
 
-    // ==================== 调试模式 ====================
+    // -------------------- 调试模式 --------------------
 
     public String debugEnabled = "<green>调试模式已启用";
     public String debugDisabled = "<yellow>调试模式已关闭";
@@ -68,17 +68,17 @@ public final class MessagesConfig {
     public String debugGroupNotMonitored = "<gray>[调试] 群 %d 未在监听列表中";
     public String debugHeartbeatTimeout = "<gray>[调试] 心跳超时: elapsed=%ds threshold=%ds";
 
-    // ==================== 调试 - 数据库 ====================
+    // -------------------- 数据库调试 --------------------
 
     public String debugDbInsert = "<gray>[调试-DB] 写入消息: group=%d user=%d content=%s row=%d time=%dms";
     public String debugDbPool = "<gray>[调试-DB] 连接池: active=%d idle=%d waiting=%d";
 
-    // ==================== 命令相关 ====================
+    // -------------------- 命令相关 --------------------
 
     public String noPermission = "<red>你没有权限使用此命令";
     public String unknownSubcommand = "<red>未知子命令: %s";
     public String cmdUsageHeader = "<gold>===== KittySnap 命令帮助 =====";
-    public String cmdUsageFooter = "<gold>==============================";
+    public String cmdUsageFooter = "<gold>--------------------==========";
     public String cmdUsageLine = "<yellow>/<white>%s %s <gray>- %s";
 
     public String addgroupUsage = "<red>用法: /kittysnap addgroup 群号";
@@ -106,7 +106,7 @@ public final class MessagesConfig {
     public String reloadDone = "<green>配置文件与语言文件已重载";
     public String reloadDesc = "重载配置文件与语言文件";
 
-    // ==================== 数据库 ====================
+    // -------------------- 数据库 --------------------
 
     public String dbInitializing = "正在初始化数据库连接池...";
     public String dbInitialized = "<green>数据库连接池初始化完成";
@@ -119,7 +119,7 @@ public final class MessagesConfig {
     public String dbTableCreateFailed = "创建数据表失败";
     public String dbInsertFailed = "插入消息到数据库失败";
 
-    // ==================== 插件内部日志 ====================
+    // -------------------- 内部日志 --------------------
 
     public String commandRegisterFailed = "无法注册命令 kittysnap，请检查 plugin.yml";
     public String noListenGroupsConfigured = "config.yml 中未配置任何监听群组 (groups)";
@@ -129,11 +129,11 @@ public final class MessagesConfig {
     public String readMessageFailed = "读取消息 %s 失败";
     public String missingKeyFallback = "<missing: %s>";
 
-    // ==================== 日志格式 ====================
+    // -------------------- 日志格式 --------------------
 
     public String logGroupMsgFormat = "[群: %d] [用户: %d] %s";
 
-    // ==================== QQ → 游戏 转发 ====================
+    // -------------------- QQ游戏转发 --------------------
 
     public String qqMessageFormat = "<gray>[QQ]</gray> <yellow>%s</yellow><gray>: %s</gray>";
     public String qqMessageLog = "[QQ消息] [群=%d] <%s> %s";

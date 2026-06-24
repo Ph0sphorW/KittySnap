@@ -16,12 +16,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-/**
- * 配置管理器
- * <p>
- * 基于 ConfigLib 管理 {@code config.yml} 和 {@code messages.yml} 的加载、保存、重载。
- * 对外提供类型安全的配置访问和便利的消息格式化方法。
- */
 public class ConfigurationManager {
 
     private static final String CONFIG_FILE = "config.yml";
@@ -41,6 +35,7 @@ public class ConfigurationManager {
 
     private final Map<String, Method> messageGetters = new ConcurrentHashMap<>();
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public ConfigurationManager(JavaPlugin plugin) {
         this.plugin = plugin;
         this.configPath = plugin.getDataFolder().toPath().resolve(CONFIG_FILE);
@@ -66,10 +61,10 @@ public class ConfigurationManager {
         YamlConfigurations.save(configPath, KittySnapConfig.class, config, properties);
     }
 
-    // ==================== 消息：Component 输出（玩家消息） ====================
+    // -------------------- 玩家消息 --------------------
 
     /**
-     * 获取格式化为 Adventure Component 的消息（用于 {@code sender.sendMessage()}）
+     * 获取格式化为 Component 的消息
      */
     public Component component(String key, Object... args) {
         String template = resolveMessage(key);
@@ -89,10 +84,10 @@ public class ConfigurationManager {
         return Component.text(prefix + " ").append(component(key, args));
     }
 
-    // ==================== 消息：纯文本输出（控制台日志） ====================
+    // -------------------- 控制台日志 --------------------
 
     /**
-     * 获取原始消息文本（已剥离 MiniMessage 标签），用于控制台日志
+     * 获取原始消息文本
      */
     public String raw(String key, Object... args) {
         String template = resolveMessage(key);
@@ -105,21 +100,17 @@ public class ConfigurationManager {
     }
 
     /**
-     * 获取带前缀的纯文本（控制台日志用）
+     * 安全地剥离 MiniMessage 标签
      */
-    public String prefixedRaw(String key, Object... args) {
-        String prefix = messages != null ? messages.getPrefix() : "[KittySnap]";
-        return prefix + " " + raw(key, args);
-    }
-
-    /** 安全地剥离 MiniMessage 标签，解析失败时返回原文 */
     private String stripTags(String text) {
         if (text == null) return "";
         Component component = safeDeserialize(text);
         return plainText.serialize(component);
     }
 
-    /** 安全解析 MiniMessage，失败时返回纯文本 Component */
+    /**
+     * 安全解析 MiniMessage
+     */
     public Component safeDeserialize(String text) {
         if (text == null || text.isEmpty()) return Component.empty();
         try {
@@ -130,8 +121,8 @@ public class ConfigurationManager {
     }
 
     /**
-     * 转义 args 中所有 String 的 MiniMessage 标签（< → \<），
-     * 防止用户输入内容被 MiniMessage 误解析为颜色标签。
+     * 转义 args 中所有 String 的 MiniMessage 标签，防止用户输入内容被 MiniMessage 误解析为颜色标签。 <p>
+     * 例如，< 将被转义为 \<
      */
     private Object[] escapeArgs(Object... args) {
         if (args == null || args.length == 0) return args;
@@ -146,7 +137,7 @@ public class ConfigurationManager {
         return escaped;
     }
 
-    // ==================== 日志便捷方法 ====================
+    // -------------------- 日志方法 --------------------
 
     public void logInfo(String key, Object... args) {
         plugin.getLogger().info(raw(key, args));
@@ -164,11 +155,10 @@ public class ConfigurationManager {
         plugin.getLogger().fine(raw(key, args));
     }
 
-    // ==================== 内部 ====================
+    // -------------------- 内部 --------------------
 
     /**
-     * 通过反射从 MessagesConfig 中读取字段值。
-     * 将 kebab-case 键转为 camelCase getter 名（如 "ws-connecting" → "getWsConnecting"）。
+     * 通过反射从 MessagesConfig 中读取字段值
      */
     private String resolveMessage(String key) {
         Method getter = messageGetters.get(key);
@@ -182,7 +172,7 @@ public class ConfigurationManager {
             } catch (NoSuchMethodException e) {
                 plugin.getLogger().warning(() -> messages != null
                         ? String.format(messages.getMissingMessageKey(), key)
-                        : "messages.yml 中缺少消息键: " + key);
+                        : "Missing message key(s) in messages.yml: " + key);
                 return null;
             }
         }
@@ -192,7 +182,7 @@ public class ConfigurationManager {
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, messages != null
                     ? String.format(messages.getReadMessageFailed(), key)
-                    : "读取消息 " + key + " 失败", e);
+                    : "Try to read the message " + key + " failed", e);
             return null;
         }
     }
@@ -216,7 +206,7 @@ public class ConfigurationManager {
         return sb.toString();
     }
 
-    // ==================== 代理方法：KittySnapConfig 常用配置 ====================
+    // -------------------- 代理方法：KittySnapConfig 常用配置 --------------------
 
     public String getWsUrl() {
         return config.getNapcat().getWsUrl();
@@ -228,10 +218,6 @@ public class ConfigurationManager {
 
     public List<Long> getListenGroups() {
         return config.getGroups();
-    }
-
-    public boolean hasListenGroups() {
-        return !config.getGroups().isEmpty();
     }
 
     public boolean addListenGroup(long groupId) {
@@ -315,29 +301,15 @@ public class ConfigurationManager {
         return Math.max(512, config.getDatabase().getPool().getPrepStmtCacheSqlLimit());
     }
 
-    // ==================== Napcat 新配置 ====================
-
-    public String getNapcatThreadName() {
-        return config.getNapcat().getThreadName();
-    }
-
-    public int getNapcatCloseCode() {
-        return Math.max(1000, config.getNapcat().getCloseCode());
-    }
-
-    public String getNapcatCloseReason() {
-        return config.getNapcat().getCloseReason();
-    }
-
-    public String getNapcatManualReconnectReason() {
-        return config.getNapcat().getManualReconnectReason();
-    }
+    // -------------------- Napcat 新配置 --------------------
 
     public int getNapcatDebugTruncateLength() {
         return Math.max(50, config.getNapcat().getDebugTruncateLength());
     }
 
-    /** Napcat 连接 Token（可能为空） */
+    /**
+     * Napcat 连接 Token（可能为空）
+     */
     public String getNapcatToken() {
         return config.getNapcat().getToken();
     }
@@ -346,17 +318,13 @@ public class ConfigurationManager {
         return Math.max(5, config.getNapcat().getConnectTimeout());
     }
 
-    public long getNapcatHeartbeatTimeout() {
-        return Math.max(10, config.getNapcat().getHeartbeatTimeout());
-    }
-
-    // ==================== Misc ====================
+    // -------------------- Misc --------------------
 
     public int getNicknameTruncateLength() {
         return Math.max(32, config.getMisc().getNicknameTruncateLength());
     }
 
-    // ==================== 日志格式快捷方法 ====================
+    // -------------------- 日志格式快捷方法 --------------------
 
     /**
      * 获取日志消息格式的文本，使用 MessagesConfig 的 logGroupMsgFormat 键。

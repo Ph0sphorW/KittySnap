@@ -7,21 +7,13 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * KittySnap 主配置 — 由 ConfigLib 自动映射 {@code config.yml}。
- * <p>
- * 字段名使用 camelCase，ConfigLib 的 {@code LOWER_KEBAB_CASE} NameFormatter
- * 会自动转换为 kebab-case 写入 YAML（如 {@code wsUrl} → {@code ws-url}）。
- */
 @Configuration
 @Getter
 public final class KittySnapConfig {
 
-    // ==================== 构造器（ConfigLib 需要无参构造） ====================
-
     public KittySnapConfig() {}
 
-    // ==================== Napcat 连接 ====================
+    // -------------------- Napcat 连接 --------------------
 
     public Napcat napcat = new Napcat();
 
@@ -59,12 +51,12 @@ public final class KittySnapConfig {
         public int debugTruncateLength = 200;
     }
 
-    // ==================== 监听群聊 ====================
+    // -------------------- 监听群聊 --------------------
 
     @Comment({"监听群号列表", "格式:", "  - 123456789", "  - 987654321"})
     public List<Long> groups = new ArrayList<>();
 
-    // ==================== 聊天转发 ====================
+    // -------------------- 聊天转发 --------------------
 
     public ChatForward chatForward = new ChatForward();
 
@@ -81,7 +73,7 @@ public final class KittySnapConfig {
         public List<Long> targetGroups = new ArrayList<>();
     }
 
-    // ==================== 数据库 ====================
+    // -------------------- 数据库 --------------------
 
     public Database database = new Database();
 
@@ -137,7 +129,7 @@ public final class KittySnapConfig {
         }
     }
 
-    // ==================== 杂项 ====================
+    // -------------------- 杂项 --------------------
 
     public Misc misc = new Misc();
 

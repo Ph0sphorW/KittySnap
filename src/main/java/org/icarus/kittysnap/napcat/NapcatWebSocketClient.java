@@ -22,15 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 
-/**
- * Napcat WebSocket 客户端 — 连接生命周期 + 功能委派
- * <p>
- * 连接管理在本类；监听器管理 → {@link ListenerManager}；
- * 消息发送/API → {@link MessageSender}；WS 回调 → {@link WsListener}。
- */
 public class NapcatWebSocketClient {
-
-    private static final int CLOSE_NORMAL = 1000;
 
     private final JavaPlugin plugin;
     private final ConfigurationManager cfg;
@@ -53,11 +45,11 @@ public class NapcatWebSocketClient {
         this.plugin = plugin;
         this.cfg = cfg;
         this.listeners = new ListenerManager(cfg);
-        this.dispatcher = new MessageDispatcher(plugin, cfg, executor, listeners.entries());
-        this.sender = new MessageSender(cfg, () -> connected, () -> webSocket, () -> executor);
+        this.dispatcher = new MessageDispatcher(plugin, cfg, listeners.entries());
+        this.sender = new MessageSender(cfg, pendingApiCalls, () -> connected, () -> webSocket, () -> executor);
     }
 
-    // ==================== 调试 ====================
+    // -------------------- 调试 --------------------
 
     public void setDebugConsumer(BiConsumer<String, Object[]> consumer) {
         dispatcher.setDebugConsumer(consumer);
@@ -71,15 +63,30 @@ public class NapcatWebSocketClient {
         dispatcher.setSegmentHandler(handler);
     }
 
-    // ==================== 监听器管理（委派） ====================
+    // -------------------- 监听器管理 --------------------
 
-    public void addGroup(long groupId, IGroupMessageListener listener) { listeners.add(groupId, listener); }
-    public void addGroups(Collection<Long> gids, IGroupMessageListener l) { listeners.addAll(gids, l); }
-    public boolean removeGroup(long groupId) { return listeners.remove(groupId); }
-    public void removeListenersByType(Class<? extends IGroupMessageListener> t) { listeners.removeByType(t); }
-    public Set<Long> getMonitoredGroups() { return listeners.getMonitoredGroups(); }
+    public void addGroup(long groupId, IGroupMessageListener listener) {
+        listeners.add(groupId, listener);
+    }
 
-    // ==================== 连接生命周期 ====================
+    public void addGroups(Collection<Long> gids, IGroupMessageListener l) {
+        listeners.addAll(gids, l);
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean removeGroup(long groupId) {
+        return listeners.remove(groupId);
+    }
+
+    public void removeListenersByType(Class<? extends IGroupMessageListener> t) {
+        listeners.removeByType(t);
+    }
+
+    public Set<Long> getMonitoredGroups() {
+        return listeners.getMonitoredGroups();
+    }
+
+    // -------------------- 连接 --------------------
 
     public void connect() {
         if (connected) return;
@@ -92,7 +99,11 @@ public class NapcatWebSocketClient {
         autoReconnect = true;
         connected = false;
         cancelReconnectTask();
-        try { if (webSocket != null) webSocket.sendClose(CLOSE_NORMAL, "Manual reconnect"); } catch (Exception ignored) {}
+        try {
+            if (webSocket != null) webSocket.sendClose(1000, "Manual reconnect");
+        } catch (Exception ignored) {
+            // 滚木
+        }
         ensureExecutor();
         doConnect();
     }
@@ -101,7 +112,10 @@ public class NapcatWebSocketClient {
         autoReconnect = false;
         connected = false;
         cancelReconnectTask();
-        try { if (webSocket != null) webSocket.sendClose(CLOSE_NORMAL, "Plugin shutting down"); } catch (Exception ignored) {}
+        try {
+            if (webSocket != null) webSocket.sendClose(1000, "Plugin shutting down");
+        } catch (Exception ignored) {
+        }
         if (executor != null) executor.shutdownNow();
         cfg.logInfo("ws-disconnected");
     }
@@ -146,21 +160,22 @@ public class NapcatWebSocketClient {
         }, cfg.getReconnectDelay() * 20L).getTaskId();
     }
 
-    // ==================== 消息发送（委派） ====================
+    // -------------------- 消息发送 --------------------
 
-    public void sendGroupMessage(long groupId, String message) { sender.sendGroupMessage(groupId, message); }
-    public JSONObject sendActionSync(String action, JSONObject params, long timeout) { return sender.sendActionSync(action, params, timeout); }
-    public String queryGroupMemberName(long groupId, long userId) { return sender.queryGroupMemberName(groupId, userId); }
+    public void sendGroupMessage(long groupId, String message) {
+        sender.sendGroupMessage(groupId, message);
+    }
 
-    // ==================== WS 回调桥（由 WsListener 调用） ====================
+    public JSONObject sendActionSync(String action, JSONObject params, long timeout) {
+        return sender.sendActionSync(action, params, timeout);
+    }
 
-    void onWsOpen() { debug("debug-ws-open"); }
-    void onWsClosed() { this.connected = false; debug("debug-ws-close"); }
-    void onWsError(String msg) { debug("debug-ws-error", msg); }
-    ExecutorService executor() { return executor; }
+    public String queryGroupMemberName(long groupId, long userId) {
+        return sender.queryGroupMemberName(groupId, userId);
+    }
 
-    private void debug(String key, Object... args) {
-        // 暂无调试消费者
+    ExecutorService executor() {
+        return executor;
     }
 
     private void cancelReconnectTask() {

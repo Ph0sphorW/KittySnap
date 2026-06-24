@@ -13,12 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 游戏内聊天 → QQ群 转发器
- * <p>
- * 监听 {@link AsyncChatEvent}，将玩家聊天消息转发到
- * {@code chat-forward.target-groups} 中指定的 QQ 群。
- * <p>
- * 如果 target-groups 为空，则转发到主配置 {@code groups} 中的所有群。
+ * 将玩家聊天消息转发到 {@code chat-forward.target-groups} 中指定的 QQ 群 <p>
+ * 如果 {@code target-groups} 为空，则转发到配置 {@code groups} 中的所有群
  */
 public class ChatToGroupForwarder implements Listener {
 
@@ -40,7 +36,7 @@ public class ChatToGroupForwarder implements Listener {
         Player player = event.getPlayer();
         String format = cfg.getChatForwardFormat();
 
-        // 将 Component 转纯文本再格式化
+        // Component 转纯文本格式化
         String displayName = PLAIN.serialize(player.displayName());
         String message = PLAIN.serialize(event.message());
         String forwardText = String.format(format, displayName, message);
@@ -48,13 +44,14 @@ public class ChatToGroupForwarder implements Listener {
         // 获取目标群列表
         List<Long> targetGroups = cfg.getChatForwardTargetGroups();
         if (targetGroups.isEmpty()) {
-            // 未单独指定则转发到所有监听群
+            // 所有群
             Set<Long> monitored = napcatClient.getMonitoredGroups();
             for (long groupId : monitored) {
                 napcatClient.sendGroupMessage(groupId, forwardText);
             }
         } else {
             for (long groupId : targetGroups) {
+                // 目标群
                 napcatClient.sendGroupMessage(groupId, forwardText);
             }
         }

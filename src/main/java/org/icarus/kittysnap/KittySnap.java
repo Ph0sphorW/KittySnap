@@ -11,6 +11,7 @@ import org.icarus.kittysnap.command.KittySnapCommand;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
 import org.icarus.kittysnap.handler.OB11SegmentHandler;
+import org.icarus.kittysnap.handler.handlers.ImagePreviewerIntegration;
 
 import java.util.function.BiConsumer;
 
@@ -24,6 +25,7 @@ public final class KittySnap extends JavaPlugin {
     private ChatToGroupForwarder chatForwarder;
     @Getter
     private DatabaseManager databaseManager;
+    @SuppressWarnings({"FieldCanBeLocal"})
     private KittySnapCommand commandExecutor;
 
     @Getter
@@ -59,10 +61,10 @@ public final class KittySnap extends JavaPlugin {
     public void reload() {
         configManager.reload();
 
-        // 清理旧的 QQToGameBroadcaster 实例，防止重复注册
+        // 清理已存在，防止反复注册
         napcatClient.removeListenersByType(QQToGameBroadcaster.class);
 
-        // 用新配置重新注册所有群
+        // 用新配置重新注册
         var configGroups = configManager.getListenGroups();
         if (!configGroups.isEmpty()) {
             napcatClient.addGroups(configGroups, new QQToGameBroadcaster(configManager));
@@ -82,9 +84,12 @@ public final class KittySnap extends JavaPlugin {
         databaseManager.init();
         napcatClient.setDatabaseManager(databaseManager);
 
-        // 初始化 OB11 段处理器
+        // 初始化消息片段处理器
         OB11SegmentHandler segmentHandler = new OB11SegmentHandler(napcatClient);
         napcatClient.setSegmentHandler(segmentHandler);
+
+        // 初始化 ImagePreviewer 集成，reflect 调用，感谢多多
+        ImagePreviewerIntegration.init(this);
 
         commandExecutor = new KittySnapCommand(this, configManager);
         var cmd = getCommand("kittysnap");
@@ -115,8 +120,6 @@ public final class KittySnap extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        chatForwarder = null;
-        commandExecutor = null;
         if (napcatClient != null) {
             napcatClient.disconnect();
             napcatClient = null;

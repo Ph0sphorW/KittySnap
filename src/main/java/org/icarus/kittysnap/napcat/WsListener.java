@@ -11,7 +11,9 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
-/** Napcat WebSocket 事件监听器（处理 onOpen/onText/onClose/onError） */
+/**
+ * WebSocket 事件监听器
+ */
 class WsListener implements WebSocket.Listener {
 
     private final StringBuilder buf = new StringBuilder();
@@ -20,6 +22,7 @@ class WsListener implements WebSocket.Listener {
     private final JavaPlugin plugin;
     private final MessageDispatcher dispatcher;
     private final ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls;
+    private final int truncateLen;
 
     WsListener(NapcatWebSocketClient client, ConfigurationManager cfg, JavaPlugin plugin,
                MessageDispatcher dispatcher,
@@ -29,12 +32,12 @@ class WsListener implements WebSocket.Listener {
         this.plugin = plugin;
         this.dispatcher = dispatcher;
         this.pendingApiCalls = pendingApiCalls;
+        this.truncateLen = cfg.getNapcatDebugTruncateLength();
     }
 
     @Override
     public void onOpen(WebSocket ws) {
         cfg.logInfo("ws-opened");
-        client.onWsOpen();
         ws.request(1);
     }
 
@@ -48,7 +51,7 @@ class WsListener implements WebSocket.Listener {
 
         if (routeEcho(full)) return null;
 
-        plugin.getLogger().info("[WS-RECV] ← " + (full.length() > 300 ? full.substring(0, 300) + "..." : full));
+        plugin.getLogger().info("[WS-RECV] ← " + (full.length() > truncateLen ? full.substring(0, truncateLen) + "..." : full));
         ExecutorService exec = client.executor();
         if (exec != null && !exec.isShutdown()) {
             exec.execute(() -> dispatcher.dispatch(full));
@@ -60,7 +63,6 @@ class WsListener implements WebSocket.Listener {
 
     @Override
     public CompletionStage<?> onClose(WebSocket ws, int code, String reason) {
-        client.onWsClosed();
         cfg.logInfo("ws-closed", code, reason != null ? reason : "");
         client.scheduleReconnect();
         return null;
@@ -69,7 +71,6 @@ class WsListener implements WebSocket.Listener {
     @Override
     public void onError(WebSocket ws, Throwable error) {
         cfg.logWarning("ws-error", error.getMessage());
-        client.onWsError(error.getMessage());
     }
 
     private boolean routeEcho(String json) {
@@ -78,8 +79,12 @@ class WsListener implements WebSocket.Listener {
             String echo = root.getString("echo");
             if (echo == null || echo.isEmpty()) return false;
             CompletableFuture<JSONObject> f = pendingApiCalls.remove(echo);
-            if (f != null) { f.complete(root); return true; }
-        } catch (Exception ignored) {}
+            if (f != null) {
+                f.complete(root);
+                return true;
+            }
+        } catch (Exception ignored) {
+        }
         return false;
     }
 }

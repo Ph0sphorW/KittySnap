@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * OB11 消息段基类，持有 type 和 data
+ * OB11 消息段基类
  */
 @Getter
 @Setter
@@ -26,10 +26,7 @@ public abstract class OB11SegmentBase implements OB11Segment {
     }
 
     /**
-     * 根据 JSONObject 创建对应类型的 OB11Segment 实例
-     *
-     * @param obj fastjson2 JSONObject，包含 type 和 data 字段
-     * @return 对应的 OB11Segment 子类实例
+     * 简单分类器，不喜欢用 filter
      */
     public static OB11SegmentBase fromJSON(JSONObject obj) {
         if (obj == null) return null;

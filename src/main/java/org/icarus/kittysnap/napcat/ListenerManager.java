@@ -7,11 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-/**
- * 群消息监听器注册管理器
- * <p>
- * 持有 {@link GroupEntry} 集合，管理 IGroupMessageListener 的增删查。
- */
 public class ListenerManager {
 
     private final CopyOnWriteArraySet<GroupEntry> groupListeners = new CopyOnWriteArraySet<>();

@@ -5,33 +5,26 @@ import com.alibaba.fastjson2.JSONObject;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
-import org.icarus.kittysnap.onebotapi.OB11Segment;
-import org.icarus.kittysnap.handler.BuildResult;
+import org.icarus.kittysnap.handler.handlers.BuildResult;
 import org.icarus.kittysnap.handler.OB11SegmentHandler;
 
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 
-/**
- * 消息分发器：解析 Napcat JSON → 过滤群消息 → 写入 DB → 回调监听器。
- */
 public class MessageDispatcher {
 
     private final JavaPlugin plugin;
     private final ConfigurationManager cfg;
-    private volatile ExecutorService executor;
     private final CopyOnWriteArraySet<GroupEntry> groupListeners;
     private DatabaseManager databaseManager;
     private OB11SegmentHandler segmentHandler;
     private BiConsumer<String, Object[]> debugConsumer;
 
-    MessageDispatcher(JavaPlugin plugin, ConfigurationManager cfg, ExecutorService executor,
+    MessageDispatcher(JavaPlugin plugin, ConfigurationManager cfg,
                       CopyOnWriteArraySet<GroupEntry> groupListeners) {
         this.plugin = plugin;
         this.cfg = cfg;
-        this.executor = executor;
         this.groupListeners = groupListeners;
     }
 
@@ -43,10 +36,6 @@ public class MessageDispatcher {
         this.segmentHandler = handler;
     }
 
-    void updateExecutor(ExecutorService exec) {
-        this.executor = exec;
-    }
-
     void setDebugConsumer(BiConsumer<String, Object[]> c) {
         this.debugConsumer = c;
     }
@@ -55,69 +44,39 @@ public class MessageDispatcher {
         if (debugConsumer != null) debugConsumer.accept(key, args);
     }
 
-    /**
-     * 由 executor 线程调用
-     */
     void dispatch(String json) {
         try {
             JSONObject root = JSON.parseObject(json);
-            int t = cfg.getNapcatDebugTruncateLength();
-            debug("debug-msg-received", json.length() > t ? json.substring(0, t) + "..." : json);
+            debug("debug-msg-received", json);
 
             if (!"message".equals(root.getString("post_type"))
                     || !"group".equals(root.getString("message_type"))) {
-                String pt = root.getString("post_type");
-                String mt = root.getString("message_type");
-                plugin.getLogger().info("[MSG-DISPATCH] 忽略非群消息: post_type=" + pt + ", message_type=" + mt);
-                debug("debug-msg-ignored", pt);
+                debug("debug-msg-ignored", root.getString("post_type"));
                 return;
             }
 
             long groupId = root.getLongValue("group_id");
-            if (groupId == 0) {
-                plugin.getLogger().warning("[MSG-DISPATCH] 消息中 group_id 为 0，无法处理");
-                return;
-            }
+            if (groupId == 0) return;
 
             NapcatMessage napMsg = JSON.parseObject(json, NapcatMessage.class);
-
-            // — 解析 OB11 消息段 —
             napMsg.parseMessageSegments(root);
+
             plugin.getLogger().info("[MSG-DISPATCH] 收到群消息: group=" + groupId
                     + " user=" + napMsg.getSenderId()
                     + " segments=" + napMsg.getSegments());
 
-            // — 通过 OB11SegmentHandler 构建展示文本 —
-            final String displayContent;
-            if (segmentHandler != null) {
-                BuildResult result = segmentHandler.buildDisplay(
-                        napMsg.getSegments(), groupId, databaseManager);
-                displayContent = result.displayContent();
-            } else {
-                // 无 handler 时降级：拼接所有段的纯文本
-                StringBuilder fallback = new StringBuilder();
-                for (OB11Segment seg : napMsg.getSegments()) {
-                    if (seg instanceof org.icarus.kittysnap.onebotapi.OB11MessageText textSeg) {
-                        String txt = textSeg.getText();
-                        if (txt != null) fallback.append(txt);
-                    }
-                }
-                String raw = fallback.toString().trim();
-                displayContent = raw.isEmpty() ? "(消息)" : raw.replace("<", "\\<");
-            }
+            BuildResult result = segmentHandler.buildDisplay(
+                    napMsg.getSegments(), groupId, databaseManager);
+            String displayContent = result.displayContent();
 
-            // — DB —
+            // — 写入数据库 —
             if (databaseManager != null) {
                 String nick = napMsg.getSender() != null ? napMsg.getSender().getDisplayName() : "";
-                String raw = napMsg.getRawMessage() != null ? napMsg.getRawMessage() : "";
-                long u = napMsg.getSenderId();
-                long mId = napMsg.getMessageId();
-                String mSeq = napMsg.getMessageSeq();
-                long t2 = napMsg.getTime();
-                executor.execute(() -> databaseManager.insertGroupMessage(groupId, u, nick, raw, mId, mSeq, t2));
+                databaseManager.insertGroupMessage(groupId, napMsg.getSenderId(), nick, displayContent,
+                        napMsg.getMessageId(), napMsg.getMessageSeq(), napMsg.getTime());
             }
 
-            // — 分发 —
+            // 下发
             boolean handled = false;
             for (GroupEntry entry : groupListeners) {
                 if (entry.groupId() != groupId) continue;

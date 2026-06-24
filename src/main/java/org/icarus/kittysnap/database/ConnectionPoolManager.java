@@ -7,9 +7,6 @@ import org.icarus.kittysnap.config.ConfigurationManager;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-/**
- * HikariCP 连接池管理器：负责连接池的创建、获取连接、关闭。
- */
 public class ConnectionPoolManager {
 
     private final ConfigurationManager cfg;
@@ -19,9 +16,7 @@ public class ConnectionPoolManager {
         this.cfg = cfg;
     }
 
-    /**
-     * 初始化连接池，返回 true 表示成功
-     */
+    @SuppressWarnings("ExtractMethodRecommender")
     boolean init() {
         HikariConfig hk = new HikariConfig();
         hk.setJdbcUrl(cfg.getDbJdbcUrl());
@@ -51,7 +46,7 @@ public class ConnectionPoolManager {
         // 测试连接
         try (Connection conn = getConnection()) {
             if (conn == null) {
-                cfg.logSevere("db-connect-error", "无法获取连接");
+                cfg.logSevere("db-connect-error", "Database connection error");
                 return false;
             }
         } catch (SQLException e) {
@@ -72,7 +67,7 @@ public class ConnectionPoolManager {
     }
 
     /**
-     * 获取连接池统计信息（用于调试）
+     * 获取连接池统计信息
      */
     PoolStats getPoolStats() {
         if (dataSource == null || dataSource.isClosed()) return new PoolStats(0, 0, 0);

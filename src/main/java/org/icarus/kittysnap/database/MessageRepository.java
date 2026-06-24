@@ -10,9 +10,6 @@ import java.sql.Statement;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 
-/**
- * 群消息数据访问层：建表、插入消息。
- */
 public class MessageRepository {
 
     private final ConfigurationManager cfg;
@@ -45,7 +42,7 @@ public class MessageRepository {
                     group_id    BIGINT       NOT NULL,
                     user_id     BIGINT       NOT NULL,
                     nickname    VARCHAR(128),
-                    raw_message TEXT         NOT NULL,
+                    processed_message TEXT         NOT NULL,
                     message_id  BIGINT,
                     message_seq VARCHAR(64),
                     msg_time    BIGINT,
@@ -65,13 +62,13 @@ public class MessageRepository {
     }
 
     /**
-     * 插入消息，返回自增 ID 或 -1
+     * 插入消息，返回 ID 或 -1
      */
-    boolean insert(long groupId, long userId, String nickname, String rawMessage,
-                long messageId, String messageSeq, long msgTime) {
+    boolean insert(long groupId, long userId, String nickname, String processedMessage,
+                   long messageId, String messageSeq, long msgTime) {
         if (!pool.isReady()) return false;
 
-        String sql = "INSERT INTO %s (group_id, user_id, nickname, raw_message, message_id, message_seq, msg_time) "
+        String sql = "INSERT INTO %s (group_id, user_id, nickname, processed_message, message_id, message_seq, msg_time) "
                 .formatted(tableName) + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         long start = System.currentTimeMillis();
@@ -83,7 +80,7 @@ public class MessageRepository {
             ps.setLong(1, groupId);
             ps.setLong(2, userId);
             ps.setString(3, nickname != null && nickname.length() > trunc ? nickname.substring(0, trunc) : nickname);
-            ps.setString(4, rawMessage);
+            ps.setString(4, processedMessage);
             ps.setLong(5, messageId);
             ps.setString(6, messageSeq);
             ps.setLong(7, msgTime);
@@ -96,7 +93,7 @@ public class MessageRepository {
             }
 
             cfg.logInfo("db-insert-message", groupId, userId, id);
-            debug("debug-db-insert", groupId, userId, rawMessage, id, elapsed);
+            debug("debug-db-insert", groupId, userId, processedMessage, id, elapsed);
 
             var stats = pool.getPoolStats();
             debug("debug-db-pool", stats.active(), stats.idle(), stats.waiting());
@@ -110,16 +107,13 @@ public class MessageRepository {
         }
     }
 
-    boolean insert(long groupId, long userId, String nickname, String rawMessage) {
-        return insert(groupId, userId, nickname, rawMessage, 0, null, System.currentTimeMillis() / 1000);
-    }
-
     /**
-     * 按 OneBot message_id 查询已存储的原始消息
+     * 按 message_id 查询已存储的原始消息
      *
      * @param groupId   群号
      * @param messageId OneBot 消息 ID
-     * @return 查询结果，包含发送者昵称和原始消息内容；若未找到返回 null
+     * @return 查询结果，包含 nickname 和已加工的 message；未找到返回 null
+     *
      */
     public OriginalMessage queryByMessageId(long groupId, long messageId) {
         if (!pool.isReady()) return null;
@@ -144,15 +138,17 @@ public class MessageRepository {
         return null;
     }
 
-    /** 原始消息查询结果 */
-    public record OriginalMessage(String senderName, String rawMessage) {
-        /** 获取用于展示的摘要文本（前 20 字 + 末尾可能省略） */
+    /**
+     * 原始消息查询结果
+     */
+    public record OriginalMessage(String senderName, String processedMessage) {
+        /**
+         * 用于展示的摘要文本，maxLen 为最大长度
+         */
         public String summary(int maxLen) {
-            if (rawMessage == null || rawMessage.isEmpty()) return "";
-            // 移除 rawMessage 中可能的 CQ 码，只保留纯文本
-            String plain = rawMessage.replaceAll("\\[CQ:[^]]*]", "").trim();
-            if (plain.length() <= maxLen) return plain;
-            return plain.substring(0, maxLen) + "...";
+            if (processedMessage == null || processedMessage.isEmpty()) return "";
+            if (processedMessage.length() <= maxLen) return processedMessage;
+            return processedMessage.substring(0, maxLen) + "...";
         }
     }
 }

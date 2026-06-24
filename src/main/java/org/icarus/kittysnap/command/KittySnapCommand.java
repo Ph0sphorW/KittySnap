@@ -16,10 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * KittySnap 命令执行器
- * <p>
- * 主命令: /kittysnap (别名: /ks, /bot)
- * <p>
  * 子命令:
  * <ul>
  *   <li>addgroup &lt;群号&gt;     — 添加监听群聊</li>
@@ -76,8 +72,9 @@ public class KittySnapCommand implements TabExecutor {
         };
     }
 
-    // ==================== 子命令处理 ====================
+    // -------------------- 子命令处理 --------------------
 
+    @SuppressWarnings("SameReturnValue")
     private boolean handleAddGroup(CommandSender sender, String[] args) {
         if (args.length < 2) {
             sender.sendMessage(cfg.prefixed("addgroup-usage"));
@@ -86,14 +83,14 @@ public class KittySnapCommand implements TabExecutor {
         long groupId = parseGroupId(args[1], sender);
         if (groupId <= 0) return true;
 
-        // 保存到配置文件（如果已存在会返回 false）
+        // 保存到配置文件，已存在就跳出
         boolean added = cfg.addListenGroup(groupId);
         if (!added) {
             sender.sendMessage(cfg.prefixed("addgroup-already-exists", groupId));
             return true;
         }
 
-        // 注册到运行时监听
+        // 注册监听
         plugin.getNapcatClient().addGroup(groupId, (napMsg, gid, uid, content) -> {
             plugin.getLogger().info(cfg.logGroupMsgFormat(gid, uid, content));
         });
@@ -102,6 +99,7 @@ public class KittySnapCommand implements TabExecutor {
         return true;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private boolean handleDelGroup(CommandSender sender, String[] args) {
         if (args.length < 2) {
             sender.sendMessage(cfg.prefixed("delgroup-usage"));
@@ -130,6 +128,7 @@ public class KittySnapCommand implements TabExecutor {
         return true;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private boolean handleSend(CommandSender sender, String[] args) {
         if (args.length < 3) {
             sender.sendMessage(cfg.prefixed("send-usage"));
@@ -139,14 +138,14 @@ public class KittySnapCommand implements TabExecutor {
         long groupId = parseGroupId(args[1], sender);
         if (groupId <= 0) return true;
 
-        // 检查群是否在监听列表中
+        // 检查群是否在监听列表
         Set<Long> monitored = plugin.getNapcatClient().getMonitoredGroups();
         if (!monitored.contains(groupId)) {
             sender.sendMessage(cfg.prefixed("send-not-monitored", groupId));
             return true;
         }
 
-        // 将剩余参数拼接为消息内容
+        // 剩余参数直接作消息传出
         String message = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
         plugin.getNapcatClient().sendGroupMessage(groupId, message);
@@ -172,7 +171,7 @@ public class KittySnapCommand implements TabExecutor {
         return true;
     }
 
-    // ==================== Tab 补全 ====================
+    // -------------------- Tab 补全 --------------------
 
     @Override
     public List<String> onTabComplete(CommandSender sender,
@@ -204,7 +203,7 @@ public class KittySnapCommand implements TabExecutor {
         return Collections.emptyList();
     }
 
-    // ==================== 工具方法 ====================
+    // -------------------- 工具 --------------------
 
     private void sendHelp(CommandSender sender, String label) {
         sender.sendMessage(cfg.prefixed("usage-header"));
