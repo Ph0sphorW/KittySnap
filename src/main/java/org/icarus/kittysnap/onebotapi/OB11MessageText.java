@@ -1,4 +1,4 @@
-package org.icarus.kittysnap.napcat.ob11;
+package org.icarus.kittysnap.onebotapi;
 
 import java.util.Map;
 

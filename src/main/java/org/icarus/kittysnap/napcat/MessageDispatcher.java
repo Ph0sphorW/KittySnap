@@ -5,9 +5,9 @@ import com.alibaba.fastjson2.JSONObject;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
-import org.icarus.kittysnap.napcat.ob11.OB11Segment;
-import org.icarus.kittysnap.napcat.ob11.handler.BuildResult;
-import org.icarus.kittysnap.napcat.ob11.handler.OB11SegmentHandler;
+import org.icarus.kittysnap.onebotapi.OB11Segment;
+import org.icarus.kittysnap.handler.BuildResult;
+import org.icarus.kittysnap.handler.OB11SegmentHandler;
 
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -97,7 +97,7 @@ public class MessageDispatcher {
                 // 无 handler 时降级：拼接所有段的纯文本
                 StringBuilder fallback = new StringBuilder();
                 for (OB11Segment seg : napMsg.getSegments()) {
-                    if (seg instanceof org.icarus.kittysnap.napcat.ob11.OB11MessageText textSeg) {
+                    if (seg instanceof org.icarus.kittysnap.onebotapi.OB11MessageText textSeg) {
                         String txt = textSeg.getText();
                         if (txt != null) fallback.append(txt);
                     }

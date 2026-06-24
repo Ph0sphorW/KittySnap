@@ -1,7 +1,6 @@
-package org.icarus.kittysnap.napcat.ob11.handler;
+package org.icarus.kittysnap.handler.handlers;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -10,7 +9,7 @@ import java.util.stream.Stream;
  * <p>
  * OneBot 11 标准 face ID 全覆盖（0–221）。
  */
-public enum FaceMapper {
+public enum QQFaceMapper {
 
     // 基础表情 0–55
     SURPRISED(0, "惊讶"), POUT(1, "撇嘴"), SEXY(2, "色"), DAZED(3, "发呆"),
@@ -86,7 +85,7 @@ public enum FaceMapper {
     private final long id;
     private final String name;
 
-    FaceMapper(long id, String name) {
+    QQFaceMapper(long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -95,6 +94,10 @@ public enum FaceMapper {
      * 根据 ID 获取表情名，未知 ID 返回 "[表情{id}]"
      */
     public static String getName(long id) {
-        return NAME_MAP.getOrDefault(id, "[表情" + id + "]");
+        try {
+            return NAME_MAP.getOrDefault(id, "[表情" + id + "]");
+        } catch (Exception e){
+            return "[未知表情]";
+        }
     }
 }

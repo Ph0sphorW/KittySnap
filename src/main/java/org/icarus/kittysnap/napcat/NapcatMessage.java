@@ -5,9 +5,9 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
-import org.icarus.kittysnap.napcat.ob11.OB11MessageText;
-import org.icarus.kittysnap.napcat.ob11.OB11Segment;
-import org.icarus.kittysnap.napcat.ob11.OB11SegmentBase;
+import org.icarus.kittysnap.onebotapi.OB11MessageText;
+import org.icarus.kittysnap.onebotapi.OB11Segment;
+import org.icarus.kittysnap.onebotapi.OB11SegmentBase;
 
 import java.util.ArrayList;
 import java.util.Collections;

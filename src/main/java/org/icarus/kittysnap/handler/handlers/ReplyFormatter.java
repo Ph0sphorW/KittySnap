@@ -1,9 +1,11 @@
-package org.icarus.kittysnap.napcat.ob11.handler;
+package org.icarus.kittysnap.handler.handlers;
 
 import org.icarus.kittysnap.database.DatabaseManager;
 import org.icarus.kittysnap.database.MessageRepository;
-import org.icarus.kittysnap.napcat.ob11.OB11MessageReply;
-import org.icarus.kittysnap.napcat.ob11.OB11Segment;
+import org.icarus.kittysnap.handler.BuildResult;
+import org.icarus.kittysnap.handler.OB11SegmentHandler;
+import org.icarus.kittysnap.onebotapi.OB11MessageReply;
+import org.icarus.kittysnap.onebotapi.OB11Segment;
 
 import java.util.List;
 

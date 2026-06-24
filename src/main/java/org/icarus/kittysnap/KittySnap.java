@@ -10,7 +10,7 @@ import org.icarus.kittysnap.chat.QQToGameBroadcaster;
 import org.icarus.kittysnap.command.KittySnapCommand;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
-import org.icarus.kittysnap.napcat.ob11.handler.OB11SegmentHandler;
+import org.icarus.kittysnap.handler.OB11SegmentHandler;
 
 import java.util.function.BiConsumer;
 
