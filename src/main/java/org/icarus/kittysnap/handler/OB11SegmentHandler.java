@@ -39,9 +39,9 @@ public record OB11SegmentHandler(NapcatWebSocketClient napcatClient) {
             case OB11MessageFace face -> "[" + QQFaceMapper.getName(face.getFaceId()) + "]";
             case OB11MessageImage img -> handleImage(img);
             // TODO 卡片消息网址解析
-            case OB11MessageJson j -> "[卡片消息]";
-            case OB11MessageMarkdown m -> "[Markdown消息]";
-            case OB11MessageUnknown u -> "[其它消息]";
+            case OB11MessageJson ignored -> "[卡片消息]";
+            case OB11MessageMarkdown ignored -> "[Markdown消息]";
+            case OB11MessageUnknown ignored -> "[其它消息]";
             default -> "";
         };
     }
