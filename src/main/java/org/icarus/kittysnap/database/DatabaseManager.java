@@ -59,4 +59,11 @@ public class DatabaseManager {
     public boolean insertGroupMessage(long groupId, long userId, String nickname, String rawMessage) {
         return messageRepo.insert(groupId, userId, nickname, rawMessage);
     }
+
+    /**
+     * 按 OneBot message_id 查询已存储的原始消息
+     */
+    public MessageRepository.OriginalMessage queryOriginalMessage(long groupId, long messageId) {
+        return messageRepo.queryByMessageId(groupId, messageId);
+    }
 }

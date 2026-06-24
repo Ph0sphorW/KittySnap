@@ -113,4 +113,46 @@ public class MessageRepository {
     boolean insert(long groupId, long userId, String nickname, String rawMessage) {
         return insert(groupId, userId, nickname, rawMessage, 0, null, System.currentTimeMillis() / 1000);
     }
+
+    /**
+     * 按 OneBot message_id 查询已存储的原始消息
+     *
+     * @param groupId   群号
+     * @param messageId OneBot 消息 ID
+     * @return 查询结果，包含发送者昵称和原始消息内容；若未找到返回 null
+     */
+    public OriginalMessage queryByMessageId(long groupId, long messageId) {
+        if (!pool.isReady()) return null;
+        String sql = "SELECT nickname, raw_message FROM %s WHERE group_id = ? AND message_id = ? LIMIT 1"
+                .formatted(tableName);
+        try (Connection conn = pool.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, groupId);
+            ps.setLong(2, messageId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String nick = rs.getString("nickname");
+                    String raw = rs.getString("raw_message");
+                    if (nick == null) nick = "未知用户";
+                    if (raw == null) raw = "";
+                    return new OriginalMessage(nick, raw);
+                }
+            }
+        } catch (SQLException e) {
+            java.util.logging.Logger.getGlobal().log(Level.WARNING, "查询原始消息失败 [message_id=" + messageId + "]", e);
+        }
+        return null;
+    }
+
+    /** 原始消息查询结果 */
+    public record OriginalMessage(String senderName, String rawMessage) {
+        /** 获取用于展示的摘要文本（前 20 字 + 末尾可能省略） */
+        public String summary(int maxLen) {
+            if (rawMessage == null || rawMessage.isEmpty()) return "";
+            // 移除 rawMessage 中可能的 CQ 码，只保留纯文本
+            String plain = rawMessage.replaceAll("\\[CQ:[^]]*]", "").trim();
+            if (plain.length() <= maxLen) return plain;
+            return plain.substring(0, maxLen) + "...";
+        }
+    }
 }

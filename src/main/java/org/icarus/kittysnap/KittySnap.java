@@ -3,7 +3,6 @@ package org.icarus.kittysnap;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
 import org.icarus.kittysnap.chat.ChatToGroupForwarder;
@@ -11,6 +10,7 @@ import org.icarus.kittysnap.chat.QQToGameBroadcaster;
 import org.icarus.kittysnap.command.KittySnapCommand;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
+import org.icarus.kittysnap.napcat.ob11.handler.OB11SegmentHandler;
 
 import java.util.function.BiConsumer;
 
@@ -29,7 +29,7 @@ public final class KittySnap extends JavaPlugin {
     @Getter
     private boolean debugMode = false;
 
-    public void setDebugMode(boolean debug, CommandSender toggler) {
+    public void setDebugMode(boolean debug) {
         this.debugMode = debug;
         if (debug) {
             var debugConsumer = new BiConsumer<String, Object[]>() {
@@ -59,19 +59,13 @@ public final class KittySnap extends JavaPlugin {
     public void reload() {
         configManager.reload();
 
-        var configGroups = configManager.getListenGroups();
-        var runtimeGroups = napcatClient.getMonitoredGroups();
-        var broadcaster = new QQToGameBroadcaster(configManager);
+        // 清理旧的 QQToGameBroadcaster 实例，防止重复注册
+        napcatClient.removeListenersByType(QQToGameBroadcaster.class);
 
-        for (long gid : configGroups) {
-            if (!runtimeGroups.contains(gid)) {
-                napcatClient.addGroup(gid, broadcaster);
-            }
-        }
-        for (long gid : runtimeGroups) {
-            if (!configGroups.contains(gid)) {
-                napcatClient.removeGroup(gid);
-            }
+        // 用新配置重新注册所有群
+        var configGroups = configManager.getListenGroups();
+        if (!configGroups.isEmpty()) {
+            napcatClient.addGroups(configGroups, new QQToGameBroadcaster(configManager));
         }
 
         configManager.logInfo("config-reloaded");
@@ -87,6 +81,10 @@ public final class KittySnap extends JavaPlugin {
         databaseManager = new DatabaseManager(configManager);
         databaseManager.init();
         napcatClient.setDatabaseManager(databaseManager);
+
+        // 初始化 OB11 段处理器
+        OB11SegmentHandler segmentHandler = new OB11SegmentHandler(napcatClient);
+        napcatClient.setSegmentHandler(segmentHandler);
 
         commandExecutor = new KittySnapCommand(this, configManager);
         var cmd = getCommand("kittysnap");

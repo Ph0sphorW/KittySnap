@@ -156,7 +156,7 @@ public class KittySnapCommand implements TabExecutor {
 
     private boolean handleDebug(CommandSender sender) {
         boolean newState = !plugin.isDebugMode();
-        plugin.setDebugMode(newState, sender);
+        plugin.setDebugMode(newState);
 
         if (newState) {
             sender.sendMessage(cfg.prefixed("debug-toggled-on"));

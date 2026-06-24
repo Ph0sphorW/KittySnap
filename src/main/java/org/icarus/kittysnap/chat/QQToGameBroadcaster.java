@@ -34,12 +34,15 @@ public class QQToGameBroadcaster implements IGroupMessageListener {
                 ? message.getSender().getDisplayName()
                 : String.valueOf(userId);
 
-        // 获取消息模板，填充占位符
-        String template = cfg.raw(QQ_MSG_FORMAT_KEY);
+        // 从 MessagesConfig 直接获取模板（保留 MiniMessage 标签，不被 raw() 剥离）
+        String template = cfg.getMessages() != null ? cfg.getMessages().getQqMessageFormat() : null;
         if (template == null) {
             template = "<gray>[QQ]</gray> <yellow>%s</yellow><gray>: %s</gray>";
         }
-        String formatted = String.format(template, displayName, content);
+        // 仅转义 displayName（来自消息 sender 对象，未在 Dispatcher 中转义）
+        // content 已在 MessageDispatcher 中完成 CQ:reply 解析、MiniMessage 标签转义和格式化
+        String escapedDisplayName = displayName.replace("<", "\\<");
+        String formatted = String.format(template, escapedDisplayName, content);
 
         // 解析 MiniMessage 并广播给所有在线玩家
         Component component = cfg.safeDeserialize(formatted);
@@ -47,7 +50,7 @@ public class QQToGameBroadcaster implements IGroupMessageListener {
             player.sendMessage(component);
         }
 
-        // 同时输出到控制台（不含颜色标签）
+        // 同时输出到控制台（不含颜色标签，使用 raw() 剥离标签）
         cfg.logInfo("qq-message-log", groupId, displayName, content);
     }
 
