@@ -39,7 +39,10 @@ public record OB11SegmentHandler(NapcatWebSocketClient napcatClient, Configurati
             case OB11MessageText t -> esc(t.getText());
             case OB11MessageAt at -> AtFormatter.handleAt(napcatClient, at, groupId, m);
             // TODO 更完善的表情列表
-            case OB11MessageFace face -> "[" + QQFaceMapper.getName(face.getFaceId()) + "]";
+            case OB11MessageFace face -> {
+                String fn = QQFaceMapper.getName(face.getFaceId());
+                yield fn != null ? "[" + fn + "]" : "[表情" + face.getFaceId() + "]";
+            }
             case OB11MessageImage img -> ImageHandler.handleImage(img, m);
             // TODO 卡片消息网址解析
             case OB11MessageJson ignored -> m.getSegmentCardText();
