@@ -18,7 +18,7 @@ public class ImagePreviewerIntegration {
 
     @Getter
     private static boolean available = false;
-    @SuppressWarnings({"unused"})
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static JavaPlugin plugin;
 
     public static void init(JavaPlugin ourPlugin) {
