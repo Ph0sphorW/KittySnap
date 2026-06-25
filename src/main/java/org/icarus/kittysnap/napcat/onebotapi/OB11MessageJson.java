@@ -1,4 +1,4 @@
-package org.icarus.kittysnap.onebotapi;
+package org.icarus.kittysnap.napcat.onebotapi;
 
 import java.util.Map;
 
@@ -9,6 +9,9 @@ public class OB11MessageJson extends OB11SegmentBase {
 
     public static final String TYPE = "json";
 
+    /**
+     * fastjson 解析用
+     */
     @SuppressWarnings("unused")
     public OB11MessageJson() {}
 

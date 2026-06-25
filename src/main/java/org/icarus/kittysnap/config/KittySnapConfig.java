@@ -71,6 +71,15 @@ public final class KittySnapConfig {
 
         @Comment({"转发目标群列表", "留空则转发到上方 groups 中的所有群"})
         public List<Long> targetGroups = new ArrayList<>();
+
+        @Comment("转发回复消息时，回复消息的最大长度")
+        public int maximumReplyingSummaryLength = 6;
+
+        @Comment("转发转发消息时，转发消息的最大行数")
+        public int maximumForwardingSummaryLines = 5;
+
+        @Comment("是否解析图片；默认开启")
+        public Boolean parseImage = true;
     }
 
     // -------------------- 数据库 --------------------

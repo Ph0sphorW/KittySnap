@@ -1,10 +1,10 @@
-package org.icarus.kittysnap.handler.handlers;
+package org.icarus.kittysnap.napcat.handler.handlers;
 
 import org.icarus.kittysnap.config.MessagesConfig;
 import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
-import org.icarus.kittysnap.onebotapi.OB11MessageAt;
+import org.icarus.kittysnap.napcat.onebotapi.OB11MessageAt;
 
-import static org.icarus.kittysnap.handler.Escape.esc;
+import static org.icarus.kittysnap.napcat.handler.Escaper.escape;
 
 public class AtFormatter {
     public static String handleAt(NapcatWebSocketClient napcatClient, OB11MessageAt at, long groupId, MessagesConfig m) {
@@ -15,7 +15,7 @@ public class AtFormatter {
         long uid = at.getTargetUserId();
         if (uid > 0) {
             String name = napcatClient.queryGroupMemberName(groupId, uid);
-            if (name != null) return m.getSegment().getAtPrefix() + esc(name);
+            if (name != null) return m.getSegment().getAtPrefix() + escape(name);
         }
         return m.getSegment().getAtPrefix() + target;
     }

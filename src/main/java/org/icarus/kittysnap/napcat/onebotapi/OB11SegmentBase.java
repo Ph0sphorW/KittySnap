@@ -1,4 +1,4 @@
-package org.icarus.kittysnap.onebotapi;
+package org.icarus.kittysnap.napcat.onebotapi;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public abstract class OB11SegmentBase implements OB11Segment {
     }
 
     /**
-     * 简单分类器，不喜欢用 filter
+     * 分类器
      */
     public static OB11SegmentBase fromJSON(JSONObject obj) {
         if (obj == null) return null;
@@ -44,6 +44,7 @@ public abstract class OB11SegmentBase implements OB11Segment {
             case "image" -> new OB11MessageImage(data);
             case "json" -> new OB11MessageJson(data);
             case "markdown" -> new OB11MessageMarkdown(data);
+            case "forward" -> new OB11MessageForward(data);
             default -> new OB11MessageUnknown(type, data);
         };
     }

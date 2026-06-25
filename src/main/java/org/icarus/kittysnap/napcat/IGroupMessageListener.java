@@ -1,5 +1,7 @@
 package org.icarus.kittysnap.napcat;
 
+import org.icarus.kittysnap.napcat.onebotapi.OB11Message;
+
 @FunctionalInterface
 public interface IGroupMessageListener {
 
@@ -10,5 +12,5 @@ public interface IGroupMessageListener {
      * @param userId   发送者 QQ
      * @param content  消息纯文本内容
      */
-    void onGroupMessage(NapcatMessage message, long groupId, long userId, String content);
+    void onGroupMessage(OB11Message message, long groupId, long userId, String content);
 }

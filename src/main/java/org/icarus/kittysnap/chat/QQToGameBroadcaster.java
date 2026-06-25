@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.icarus.kittysnap.napcat.IGroupMessageListener;
-import org.icarus.kittysnap.napcat.NapcatMessage;
+import org.icarus.kittysnap.napcat.onebotapi.OB11Message;
 import org.icarus.kittysnap.config.ConfigurationManager;
 
 import java.time.Instant;
@@ -26,8 +26,8 @@ public class QQToGameBroadcaster implements IGroupMessageListener {
     }
 
     @Override
-    public void onGroupMessage(NapcatMessage message, long groupId, long userId, String content) {
-        NapcatMessage.Sender sender = message.getSender();
+    public void onGroupMessage(OB11Message message, long groupId, long userId, String content) {
+        OB11Message.Sender sender = message.getSender();
         String displayName = sender != null ? sender.getDisplayName() : String.valueOf(userId);
         long qqId = sender != null ? sender.getUserId() : userId;
         String role = sender != null ? sender.getRole() : "member";
@@ -40,8 +40,8 @@ public class QQToGameBroadcaster implements IGroupMessageListener {
             default -> "群成员";
         };
 
-        var m = cfg.getMessages();
-        String hoverFormat = m != null ? m.getQq().getMessageHoverFormat() : null;
+        var messages = cfg.getMessages();
+        String hoverFormat = messages != null ? messages.getQq().getMessageHoverFormat() : null;
         if (hoverFormat == null) {
             hoverFormat = "<gray>QQ: </gray><white>%d</white>\\n<gray>时间: </gray><white>%s</white>\\n<gray>身份: </gray><white>%s</white>";
         }
@@ -51,7 +51,7 @@ public class QQToGameBroadcaster implements IGroupMessageListener {
                 + escapedName + "</hover>";
 
         // 外层模板
-        String template = m != null ? m.getQq().getMessageFormat() : null;
+        String template = messages != null ? messages.getQq().getMessageFormat() : null;
         if (template == null) {
             template = "<gray>[QQ]</gray> <yellow>%s</yellow><gray>: %s</gray>";
         }

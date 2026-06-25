@@ -1,28 +1,25 @@
-package org.icarus.kittysnap.handler.handlers;
+package org.icarus.kittysnap.napcat.handler.handlers;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import org.icarus.kittysnap.config.MessagesConfig;
-import org.icarus.kittysnap.onebotapi.OB11MessageJson;
+import org.icarus.kittysnap.napcat.onebotapi.OB11MessageJson;
 
 /**
  * 卡片消息处理器，提取内嵌 URL
  */
 public class CardHandler {
 
-    public static String handleJson(OB11MessageJson seg, MessagesConfig m) {
-        String raw = seg.getDataString("data");
-        if (raw == null || raw.isEmpty()) return m.getSegment().getCardText();
+    public static String handleJson(OB11MessageJson segment, MessagesConfig config) {
+        String raw = segment.getDataString("data");
+        if (raw == null || raw.isEmpty()) return config.getSegment().getCardText();
 
         String url = extractUrl(raw);
-        if (url == null) return m.getSegment().getCardText();
+        if (url == null) return config.getSegment().getCardText();
 
         String safeUrl = url.replace("'", "\\'");
         String hover = url.length() <= 60 ? url : url.substring(0, 60) + "...";
-        return "<click:open_url:'" + safeUrl + "'>"
-                + "<hover:show_text:'<gray>" + hover + "</gray>'>"
-                + m.getSegment().getCardText()
-                + "</hover></click>";
+        return "<click:open_url:" + safeUrl + ">" + "<hover:show_text:'<gray>" + config.getSegment().getCardPreviewHover() + hover + "</gray>'>" + config.getSegment().getCardText() + "</hover></click>";
     }
 
     /**

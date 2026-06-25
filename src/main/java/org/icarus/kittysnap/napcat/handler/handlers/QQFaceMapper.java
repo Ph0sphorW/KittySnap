@@ -1,4 +1,4 @@
-package org.icarus.kittysnap.handler.handlers;
+package org.icarus.kittysnap.napcat.handler.handlers;
 
 import java.util.Map;
 import java.util.stream.Collectors;

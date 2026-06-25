@@ -2,11 +2,13 @@ package org.icarus.kittysnap.napcat;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import lombok.Setter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
-import org.icarus.kittysnap.handler.handlers.BuildResult;
-import org.icarus.kittysnap.handler.OB11SegmentHandler;
+import org.icarus.kittysnap.napcat.handler.handlers.BuildResult;
+import org.icarus.kittysnap.napcat.handler.SegmentHandler;
+import org.icarus.kittysnap.napcat.onebotapi.OB11Message;
 
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.BiConsumer;
@@ -17,22 +19,16 @@ public class MessageDispatcher {
     private final JavaPlugin plugin;
     private final ConfigurationManager cfg;
     private final CopyOnWriteArraySet<GroupEntry> groupListeners;
+    @Setter
     private DatabaseManager databaseManager;
-    private OB11SegmentHandler segmentHandler;
+    @Setter
+    private SegmentHandler segmentHandler;
     private BiConsumer<String, Object[]> debugConsumer;
 
     MessageDispatcher(JavaPlugin plugin, ConfigurationManager cfg, CopyOnWriteArraySet<GroupEntry> groupListeners) {
         this.plugin = plugin;
         this.cfg = cfg;
         this.groupListeners = groupListeners;
-    }
-
-    void setDatabaseManager(DatabaseManager db) {
-        this.databaseManager = db;
-    }
-
-    void setSegmentHandler(OB11SegmentHandler handler) {
-        this.segmentHandler = handler;
     }
 
     void setDebugConsumer(BiConsumer<String, Object[]> c) {
@@ -48,7 +44,8 @@ public class MessageDispatcher {
             JSONObject root = JSON.parseObject(json);
             debug("debug.msg-received", json);
 
-            if (!"message".equals(root.getString("post_type")) || !"group".equals(root.getString("message_type"))) {
+            if (!"message".equals(root.getString("post_type"))
+                    || !"group".equals(root.getString("message_type"))) {
                 debug("debug.msg-ignored", root.getString("post_type"));
                 return;
             }
@@ -56,7 +53,7 @@ public class MessageDispatcher {
             long groupId = root.getLongValue("group_id");
             if (groupId == 0) return;
 
-            NapcatMessage napMsg = JSON.parseObject(json, NapcatMessage.class);
+            OB11Message napMsg = JSON.parseObject(json, OB11Message.class);
             napMsg.parseMessageSegments(root);
 
             cfg.logFine("dispatch.received", groupId, napMsg.getSenderId(), napMsg.getSegments().toString());
@@ -64,7 +61,7 @@ public class MessageDispatcher {
             BuildResult result = segmentHandler.buildDisplay(napMsg.getSegments(), groupId, databaseManager);
             String displayContent = result.displayContent();
 
-            // — 写入数据库（存原始 rawMessage，不是格式化后的 displayContent） —
+            // raw message
             if (databaseManager != null) {
                 String nick = napMsg.getSender() != null ? napMsg.getSender().getDisplayName() : "";
                 String raw = napMsg.getRawMessage() != null ? napMsg.getRawMessage() : "";
