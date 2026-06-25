@@ -4,6 +4,8 @@ version: '${version}'
 main: org.icarus.kittysnap.KittySnap
 api-version: '1.21'
 
+softdepend: [ImagePreviewer, PacketEvents]
+
 commands:
   kittysnap:
     description: KittySnap 插件主命令

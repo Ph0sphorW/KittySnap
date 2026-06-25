@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
-import org.icarus.kittysnap.handler.OB11SegmentHandler;
+import org.icarus.kittysnap.napcat.handler.SegmentHandler;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -59,7 +59,7 @@ public class NapcatWebSocketClient {
         dispatcher.setDatabaseManager(db);
     }
 
-    public void setSegmentHandler(OB11SegmentHandler handler) {
+    public void setSegmentHandler(SegmentHandler handler) {
         dispatcher.setSegmentHandler(handler);
     }
 

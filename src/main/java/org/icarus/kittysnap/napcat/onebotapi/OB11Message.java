@@ -1,13 +1,11 @@
-package org.icarus.kittysnap.napcat;
+package org.icarus.kittysnap.napcat.onebotapi;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
-import org.icarus.kittysnap.onebotapi.OB11MessageText;
-import org.icarus.kittysnap.onebotapi.OB11Segment;
-import org.icarus.kittysnap.onebotapi.OB11SegmentBase;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +16,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class NapcatMessage {
+public class OB11Message {
 
     @JSONField(name = "post_type")
     private String postType;
@@ -85,20 +83,25 @@ public class NapcatMessage {
 
         // 数组格式
         if (messageField instanceof JSONArray arr) {
-            List<OB11Segment> list = new ArrayList<>(arr.size());
-            for (int i = 0; i < arr.size(); i++) {
-                JSONObject segObj = arr.getJSONObject(i);
-                if (segObj != null) {
-                    OB11SegmentBase seg = OB11SegmentBase.fromJSON(segObj);
-                    if (seg != null) list.add(seg);
-                }
-            }
+            List<OB11Segment> list = getOB11Segments(arr);
             this.segments = Collections.unmodifiableList(list);
             return;
         }
 
         // 未知类型处理
         this.segments = Collections.emptyList();
+    }
+
+    public static @NonNull List<OB11Segment> getOB11Segments(JSONArray arr) {
+        List<OB11Segment> list = new ArrayList<>(arr.size());
+        for (int i = 0; i < arr.size(); i++) {
+            JSONObject segObj = arr.getJSONObject(i);
+            if (segObj != null) {
+                OB11SegmentBase seg = OB11SegmentBase.fromJSON(segObj);
+                if (seg != null) list.add(seg);
+            }
+        }
+        return list;
     }
 
     // ---------- 内部类 ----------
@@ -127,6 +130,7 @@ public class NapcatMessage {
 
     /**
      * 脑子没病的话，不要用这个
+     *
      * @return 神必的 NapcatMessage 文本对象
      */
     @Override
@@ -139,4 +143,6 @@ public class NapcatMessage {
                 ", segments=" + segments +
                 '}';
     }
+
+
 }

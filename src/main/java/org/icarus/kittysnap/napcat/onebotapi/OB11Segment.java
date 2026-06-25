@@ -1,6 +1,10 @@
-package org.icarus.kittysnap.onebotapi;
+package org.icarus.kittysnap.napcat.onebotapi;
+
+import com.alibaba.fastjson2.JSONObject;
 
 import java.util.Map;
+
+import static com.alibaba.fastjson2.JSON.parseArray;
 
 /**
  * 标准消息片段接口

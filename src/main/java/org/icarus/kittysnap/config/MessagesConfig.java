@@ -17,7 +17,7 @@ public final class MessagesConfig {
 
     // ==================== 通用 ====================
 
-    public String prefix = "<gradient:#D7FFFF:#33CCFF>[KittySnap]</gradient> ";
+    public String prefix = "<gradient:#D7FFFF:#33CCFF>[KittySnap]</gradient>";
 
     // ==================== 插件生命周期 ====================
 
@@ -211,12 +211,14 @@ public final class MessagesConfig {
         public String imageText = "[图片]";
         public String imageGifText = "[动画表情]";
         public String imagePreviewHover = "<gray>点击预览图片</gray>";
-        public String cardText = "[卡片消息]";
+        public String cardText = "[<#FFCCFF>卡片消息</#FFCCFF>]";
+        public String cardPreviewHover = "<gray>点击进入网页</gray>";
         public String markdownText = "[Markdown消息]";
         public String unknownText = "[其它消息]";
-        public String atAll = "@全体成员";
+        public String forwardText = "[<#0099FF>转发消息</#0099FF>]";
+        public String atAll = "<#0099CC>@全体成员</#0099CC>";
         public String atPrefix = "@";
-        public String replyFormat = "<gray>[回复 </gray><#99FF99>%s</green><gray>: %s</gray><gray>]</gray>";
+        public String replyFormat = "<gray>[回复 </gray><#99FF99>%s</#99FF99><gray>: %s</gray><gray>]</gray>";
         public String replyUnknown = "<gray>[回复 未知消息]</gray>";
     }
 }

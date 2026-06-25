@@ -10,8 +10,9 @@ import org.icarus.kittysnap.chat.QQToGameBroadcaster;
 import org.icarus.kittysnap.command.KittySnapCommand;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
-import org.icarus.kittysnap.handler.OB11SegmentHandler;
-import org.icarus.kittysnap.handler.handlers.ImagePreviewerIntegration;
+import org.icarus.kittysnap.napcat.handler.SegmentHandler;
+import org.icarus.kittysnap.napcat.handler.handlers.image.ImagePreviewerIntegration;
+import org.slf4j.Logger;
 
 import java.util.function.BiConsumer;
 
@@ -27,6 +28,13 @@ public final class KittySnap extends JavaPlugin {
     private DatabaseManager databaseManager;
     @SuppressWarnings({"FieldCanBeLocal"})
     private KittySnapCommand commandExecutor;
+
+    public static Logger LOGGER;
+
+    @Override
+    public void onLoad() {
+        LOGGER = getSLF4JLogger();
+    }
 
     @Getter
     private boolean debugMode = false;
@@ -85,7 +93,7 @@ public final class KittySnap extends JavaPlugin {
         napcatClient.setDatabaseManager(databaseManager);
 
         // 初始化消息片段处理器
-        OB11SegmentHandler segmentHandler = new OB11SegmentHandler(napcatClient, configManager);
+        SegmentHandler segmentHandler = new SegmentHandler(napcatClient, configManager);
         napcatClient.setSegmentHandler(segmentHandler);
 
         // 初始化 ImagePreviewer 集成，reflect 调用，感谢多多

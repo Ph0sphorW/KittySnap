@@ -28,12 +28,14 @@ repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://mirrors.cloud.tencent.com/nexus/repository/maven-public/")
+    maven("https://api.modrinth.com/maven")
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
     compileOnly("org.slf4j:slf4j-api:2.0.16")
+    compileOnly("maven.modrinth:image-previewer:2.1.0")
 
     implementation("com.alibaba.fastjson2:fastjson2:2.0.53")
     implementation("de.exlll:configlib-paper:4.8.1")
