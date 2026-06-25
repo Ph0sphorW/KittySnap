@@ -137,4 +137,19 @@ public final class MessagesConfig {
 
     public String qqMessageFormat = "<gray>[QQ]</gray> <yellow>%s</yellow><gray>: %s</gray>";
     public String qqMessageLog = "[QQ消息] [群=%d] <%s> %s";
+
+    // -------------------- OB11 段展示文本 --------------------
+
+    public String segmentImageText = "[图片]";
+    public String segmentImageGifText = "[动画表情]";
+    public String segmentImagePreviewHover = "<gray>点击预览图片</gray>";
+    public String segmentCardText = "[卡片消息]";
+    public String segmentMarkdownText = "[Markdown消息]";
+    public String segmentUnknownText = "[其它消息]";
+    public String segmentAtAll = "@全体成员";
+    public String segmentAtPrefix = "@";
+    public String segmentReplyFormat = "<gray>[回复 </gray><green>%s</green><gray>: %s</gray><gray>]</gray>";
+    public String segmentReplyUnknown = "<gray>[回复 未知消息]</gray>";
+
+    public String dbUnknownSender = "未知用户";
 }

@@ -35,7 +35,7 @@ public class NapcatWebSocketClient {
     private HttpClient httpClient;
     private WebSocket webSocket;
     @Getter
-    private volatile boolean connected = false;
+    volatile boolean connected = false;
     private volatile boolean autoReconnect = true;
     private volatile boolean reconnectScheduled = false;
     volatile ExecutorService executor;
@@ -121,6 +121,7 @@ public class NapcatWebSocketClient {
     }
 
     private void doConnect() {
+        ensureExecutor();
         try {
             cfg.logInfo("ws-connecting", cfg.getWsUrl());
             var builder = httpClient.newWebSocketBuilder()
@@ -174,24 +175,22 @@ public class NapcatWebSocketClient {
         return sender.queryGroupMemberName(groupId, userId);
     }
 
-    ExecutorService executor() {
-        return executor;
-    }
+    // ==================== 内部 ====================
 
-    private void cancelReconnectTask() {
-        if (reconnectTaskId != -1) {
-            Bukkit.getScheduler().cancelTask(reconnectTaskId);
-            reconnectTaskId = -1;
-        }
-    }
-
-    private void ensureExecutor() {
+    void ensureExecutor() {
         if (executor == null || executor.isShutdown()) {
             executor = Executors.newSingleThreadExecutor(r -> {
                 Thread t = new Thread(r, "Napcat-WS");
                 t.setDaemon(true);
                 return t;
             });
+        }
+    }
+
+    private void cancelReconnectTask() {
+        if (reconnectTaskId != -1) {
+            Bukkit.getScheduler().cancelTask(reconnectTaskId);
+            reconnectTaskId = -1;
         }
     }
 }

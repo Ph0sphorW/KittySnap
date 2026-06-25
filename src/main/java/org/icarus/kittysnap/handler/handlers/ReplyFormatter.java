@@ -1,5 +1,6 @@
 package org.icarus.kittysnap.handler.handlers;
 
+import org.icarus.kittysnap.config.MessagesConfig;
 import org.icarus.kittysnap.database.DatabaseManager;
 import org.icarus.kittysnap.database.MessageRepository;
 import org.icarus.kittysnap.handler.OB11SegmentHandler;
@@ -27,7 +28,7 @@ public class ReplyFormatter {
      * 构建文本，查不到原消息时显示"[回复 未知消息]"
      */
     public static BuildResult build(List<OB11Segment> segments, long groupId,
-                                    DatabaseManager db, OB11SegmentHandler handler) {
+                                    DatabaseManager db, OB11SegmentHandler handler, MessagesConfig m) {
         long replyId = extractReplyId(segments);
         StringBuilder sb = new StringBuilder();
         for (var seg : segments) {
@@ -38,18 +39,18 @@ public class ReplyFormatter {
         String content = sb.toString().trim();
 
         if (replyId > 0 && db != null) {
-            content = lookupReplyPrefix(replyId, groupId, db) + " " + content;
+            content = lookupReplyPrefix(replyId, groupId, db, m) + " " + content;
         }
         return new BuildResult(replyId, content);
     }
 
-    private static String lookupReplyPrefix(long replyMessageId, long groupId, DatabaseManager db) {
+    private static String lookupReplyPrefix(long replyMessageId, long groupId, DatabaseManager db, MessagesConfig m) {
         MessageRepository.OriginalMessage original = db.queryOriginalMessage(groupId, replyMessageId);
         if (original != null) {
             String sender = original.senderName().replace("<", "\\<");
-            String summary = original.summary(30).replace("<", "\\<");
-            return "<gray>[回复 </gray><green>%s</green><gray>: %s</gray><gray>]</gray>".formatted(sender, summary);
+            String summary = original.summary(6).replace("<", "\\<");
+            return m.getSegmentReplyFormat().formatted(sender, summary);
         }
-        return "<gray>[回复 未知消息]</gray>";
+        return m.getSegmentReplyUnknown();
     }
 }

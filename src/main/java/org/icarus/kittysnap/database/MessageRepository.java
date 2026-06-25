@@ -117,7 +117,7 @@ public class MessageRepository {
      */
     public OriginalMessage queryByMessageId(long groupId, long messageId) {
         if (!pool.isReady()) return null;
-        String sql = "SELECT nickname, raw_message FROM %s WHERE group_id = ? AND message_id = ? LIMIT 1"
+        String sql = "SELECT nickname, processed_message FROM %s WHERE group_id = ? AND message_id = ? LIMIT 1"
                 .formatted(tableName);
         try (Connection conn = pool.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -126,10 +126,10 @@ public class MessageRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String nick = rs.getString("nickname");
-                    String raw = rs.getString("raw_message");
-                    if (nick == null) nick = "未知用户";
-                    if (raw == null) raw = "";
-                    return new OriginalMessage(nick, raw);
+                    String processed = rs.getString("processed_message");
+                    if (nick == null) nick = cfg.getMessages().getDbUnknownSender();
+                    if (processed == null) processed = "";
+                    return new OriginalMessage(nick, processed);
                 }
             }
         } catch (SQLException e) {

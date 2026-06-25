@@ -10,10 +10,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
 
-/**
- * WebSocket 事件监听器
- */
 class WsListener implements WebSocket.Listener {
 
     private final StringBuilder buf = new StringBuilder();
@@ -38,39 +36,57 @@ class WsListener implements WebSocket.Listener {
     @Override
     public void onOpen(WebSocket ws) {
         cfg.logInfo("ws-opened");
+        // 确保 executor 可用（安全网：万一 doConnect 时的 executor 后续被关闭）
+        client.ensureExecutor();
+        // ★ 关键：请求接收帧数据
         ws.request(1);
+        plugin.getLogger().fine("[WS-LISTENER] onOpen: WebSocket 连接已打开，已请求第一帧数据");
     }
 
     @Override
     public CompletionStage<?> onText(WebSocket ws, CharSequence data, boolean last) {
         buf.append(data);
-        if (!last) return null;
+        if (!last) {
+            ws.request(1);
+            return CompletableFuture.completedFuture(null);
+        }
 
         String full = buf.toString();
         buf.setLength(0);
 
-        if (routeEcho(full)) return null;
+        if (routeEcho(full)) {
+            ws.request(1);
+            return CompletableFuture.completedFuture(null);
+        }
 
-        plugin.getLogger().info("[WS-RECV] ← " + (full.length() > truncateLen ? full.substring(0, truncateLen) + "..." : full));
-        ExecutorService exec = client.executor();
+        String preview = full.length() > truncateLen ? full.substring(0, truncateLen) + "..." : full;
+        plugin.getLogger().fine("[WS-RECV] ← " + preview);
+
+        client.ensureExecutor();
+        ExecutorService exec = client.executor;
         if (exec != null && !exec.isShutdown()) {
             exec.execute(() -> dispatcher.dispatch(full));
         } else {
             plugin.getLogger().warning("[WS-RECV] executor 不可用，消息被丢弃");
         }
-        return null;
+
+        ws.request(1);
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     public CompletionStage<?> onClose(WebSocket ws, int code, String reason) {
+        client.connected = false;
         cfg.logInfo("ws-closed", code, reason != null ? reason : "");
+        plugin.getLogger().fine("[WS-LISTENER] onClose: WebSocket 已关闭, code=" + code);
         client.scheduleReconnect();
-        return null;
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     public void onError(WebSocket ws, Throwable error) {
         cfg.logWarning("ws-error", error.getMessage());
+        plugin.getLogger().log(Level.WARNING, "[WS-LISTENER] onError: " + error.getMessage(), error);
     }
 
     private boolean routeEcho(String json) {
@@ -83,8 +99,7 @@ class WsListener implements WebSocket.Listener {
                 f.complete(root);
                 return true;
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
         return false;
     }
 }

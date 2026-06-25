@@ -61,7 +61,7 @@ public class MessageDispatcher {
             NapcatMessage napMsg = JSON.parseObject(json, NapcatMessage.class);
             napMsg.parseMessageSegments(root);
 
-            plugin.getLogger().info("[MSG-DISPATCH] 收到群消息: group=" + groupId
+            plugin.getLogger().fine("[MSG-DISPATCH] 收到群消息: group=" + groupId
                     + " user=" + napMsg.getSenderId()
                     + " segments=" + napMsg.getSegments());
 
@@ -69,9 +69,10 @@ public class MessageDispatcher {
                     napMsg.getSegments(), groupId, databaseManager);
             String displayContent = result.displayContent();
 
-            // — 写入数据库 —
+            // — 写入数据库（存原始 rawMessage，不是格式化后的 displayContent） —
             if (databaseManager != null) {
                 String nick = napMsg.getSender() != null ? napMsg.getSender().getDisplayName() : "";
+                String raw = napMsg.getRawMessage() != null ? napMsg.getRawMessage() : "";
                 databaseManager.insertGroupMessage(groupId, napMsg.getSenderId(), nick, displayContent,
                         napMsg.getMessageId(), napMsg.getMessageSeq(), napMsg.getTime());
             }
@@ -85,14 +86,14 @@ public class MessageDispatcher {
                 String nickname = napMsg.getSender() != null
                         ? napMsg.getSender().getDisplayName() : String.valueOf(userId);
 
-                plugin.getLogger().info("[MSG-DISPATCH] → 正在分发给监听器: group=" + groupId
+                plugin.getLogger().fine("[MSG-DISPATCH] → 正在分发给监听器: group=" + groupId
                         + " user=" + userId + " content=\"" + displayContent + "\"");
                 debug("debug-msg-dispatched", groupId, userId, displayContent);
 
                 org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
                     try {
                         entry.listener().onGroupMessage(napMsg, groupId, userId, displayContent);
-                        plugin.getLogger().info("[QQ→GAME] QQ消息已成功广播到游戏内: group=" + groupId + " user=" + nickname);
+                        plugin.getLogger().fine("[QQ→GAME] QQ消息已成功广播到游戏内: group=" + groupId + " user=" + nickname);
                     } catch (Exception e) {
                         cfg.logWarning("listener-error", groupId, nickname);
                         plugin.getLogger().log(Level.WARNING, "[QQ→GAME] 广播器执行异常", e);
@@ -101,7 +102,7 @@ public class MessageDispatcher {
             }
 
             if (!handled) {
-                plugin.getLogger().warning("[MSG-DISPATCH] 群 " + groupId + " 不在监听列表中，已忽略");
+                plugin.getLogger().fine("[MSG-DISPATCH] 群 " + groupId + " 不在监听列表中，已忽略");
                 cfg.logFine("unhandled-group-msg", groupId);
                 debug("debug-group-not-monitored", groupId);
             }

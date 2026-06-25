@@ -85,7 +85,7 @@ public final class KittySnap extends JavaPlugin {
         napcatClient.setDatabaseManager(databaseManager);
 
         // 初始化消息片段处理器
-        OB11SegmentHandler segmentHandler = new OB11SegmentHandler(napcatClient);
+        OB11SegmentHandler segmentHandler = new OB11SegmentHandler(napcatClient, configManager);
         napcatClient.setSegmentHandler(segmentHandler);
 
         // 初始化 ImagePreviewer 集成，reflect 调用，感谢多多

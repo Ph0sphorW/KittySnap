@@ -1,7 +1,11 @@
 package org.icarus.kittysnap.handler;
 
+import org.icarus.kittysnap.config.ConfigurationManager;
+import org.icarus.kittysnap.config.MessagesConfig;
 import org.icarus.kittysnap.database.DatabaseManager;
 import org.icarus.kittysnap.handler.handlers.BuildResult;
+import org.icarus.kittysnap.handler.handlers.AtFormatter;
+import org.icarus.kittysnap.handler.handlers.ImageHandler;
 import org.icarus.kittysnap.handler.handlers.QQFaceMapper;
 import org.icarus.kittysnap.handler.handlers.ReplyFormatter;
 import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
@@ -9,9 +13,7 @@ import org.icarus.kittysnap.onebotapi.*;
 
 import java.util.List;
 
-import static org.icarus.kittysnap.handler.handlers.AtFormatter.handleAt;
 import static org.icarus.kittysnap.handler.Escape.esc;
-import static org.icarus.kittysnap.handler.handlers.ImageHandler.handleImage;
 
 /**
  * 每种类型的渲染规则：
@@ -26,22 +28,23 @@ import static org.icarus.kittysnap.handler.handlers.ImageHandler.handleImage;
  *   <li>未知 → {@code [其它消息]}</li>
  * </ul>
  */
-public record OB11SegmentHandler(NapcatWebSocketClient napcatClient) {
+public record OB11SegmentHandler(NapcatWebSocketClient napcatClient, ConfigurationManager cfg) {
 
     /**
      * 将单个段转为展示文本（已有转义处理）
      */
     public String handle(OB11Segment segment, long groupId) {
+        MessagesConfig m = cfg.getMessages();
         return switch (segment) {
             case OB11MessageText t -> esc(t.getText());
-            case OB11MessageAt at -> handleAt(napcatClient, at, groupId);
+            case OB11MessageAt at -> AtFormatter.handleAt(napcatClient, at, groupId, m);
             // TODO 更完善的表情列表
             case OB11MessageFace face -> "[" + QQFaceMapper.getName(face.getFaceId()) + "]";
-            case OB11MessageImage img -> handleImage(img);
+            case OB11MessageImage img -> ImageHandler.handleImage(img, m);
             // TODO 卡片消息网址解析
-            case OB11MessageJson ignored -> "[卡片消息]";
-            case OB11MessageMarkdown ignored -> "[Markdown消息]";
-            case OB11MessageUnknown ignored -> "[其它消息]";
+            case OB11MessageJson ignored -> m.getSegmentCardText();
+            case OB11MessageMarkdown ignored -> m.getSegmentMarkdownText();
+            case OB11MessageUnknown ignored -> m.getSegmentUnknownText();
             default -> "";
         };
     }
@@ -50,6 +53,6 @@ public record OB11SegmentHandler(NapcatWebSocketClient napcatClient) {
      * 合并 reply，一并返回再完整展示文本
      */
     public BuildResult buildDisplay(List<OB11Segment> segments, long groupId, DatabaseManager db) {
-        return ReplyFormatter.build(segments, groupId, db, this);
+        return ReplyFormatter.build(segments, groupId, db, this, cfg.getMessages());
     }
 }
