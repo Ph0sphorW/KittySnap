@@ -68,24 +68,30 @@ public class OB11Message {
      */
     public void parseMessageSegments(JSONObject root) {
         Object messageField = root.get("message");
-        if (messageField == null) {
-            this.segments = Collections.emptyList();
-            return;
-        }
+        switch (messageField) {
+            case null -> {
+                this.segments = Collections.emptyList();
+                return;
+            }
 
-        // 包装为 text 段
-        if (messageField instanceof String text) {
-            this.segments = Collections.singletonList(
-                    new OB11MessageText(Collections.singletonMap("text", text))
-            );
-            return;
-        }
 
-        // 数组格式
-        if (messageField instanceof JSONArray arr) {
-            List<OB11Segment> list = getOB11Segments(arr);
-            this.segments = Collections.unmodifiableList(list);
-            return;
+            // 包装为 text 段
+            case String text -> {
+                this.segments = Collections.singletonList(
+                        new OB11MessageText(Collections.singletonMap("text", text))
+                );
+                return;
+            }
+
+
+            // 数组格式
+            case JSONArray arr -> {
+                List<OB11Segment> list = getOB11Segments(arr);
+                this.segments = Collections.unmodifiableList(list);
+                return;
+            }
+            default -> {
+            }
         }
 
         // 未知类型处理
