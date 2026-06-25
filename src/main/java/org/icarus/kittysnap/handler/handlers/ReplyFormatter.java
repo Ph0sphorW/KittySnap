@@ -49,8 +49,8 @@ public class ReplyFormatter {
         if (original != null) {
             String sender = original.senderName().replace("<", "\\<");
             String summary = original.summary(6).replace("<", "\\<");
-            return m.getSegmentReplyFormat().formatted(sender, summary);
+            return m.getSegment().getReplyFormat().formatted(sender, summary);
         }
-        return m.getSegmentReplyUnknown();
+        return m.getSegment().getReplyUnknown();
     }
 }

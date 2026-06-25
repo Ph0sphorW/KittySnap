@@ -63,7 +63,7 @@ public class MessageSender {
                     if (next != null) doSend(next.groupId(), next.message());
                 })
                 .exceptionally(ex -> {
-                    cfg.logWarning("ws-send-failed", groupId, ex.getMessage());
+                    cfg.logWarning("websocket.send-failed", groupId, ex.getMessage());
                     return null;
                 });
     }

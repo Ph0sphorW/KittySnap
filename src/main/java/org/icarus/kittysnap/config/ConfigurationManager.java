@@ -9,11 +9,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public class ConfigurationManager {
@@ -33,7 +33,8 @@ public class ConfigurationManager {
     @Getter
     private MessagesConfig messages;
 
-    private final Map<String, Method> messageGetters = new ConcurrentHashMap<>();
+    /** 扁平化消息映射: "section.field" → 模板字符串 */
+    private final Map<String, String> messageMap = new HashMap<>();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public ConfigurationManager(JavaPlugin plugin) {
@@ -54,7 +55,43 @@ public class ConfigurationManager {
     public void reload() {
         config = YamlConfigurations.update(configPath, KittySnapConfig.class, properties);
         messages = YamlConfigurations.update(messagesPath, MessagesConfig.class, properties);
-        messageGetters.clear();
+        rebuildMessageMap();
+    }
+
+    /** 递归扫描 MessagesConfig 嵌套结构，构建扁平键→值映射 */
+    private void rebuildMessageMap() {
+        messageMap.clear();
+        scanFields("", messages, messages.getClass());
+    }
+
+    private void scanFields(String prefix, Object instance, Class<?> clazz) {
+        for (Field f : clazz.getFields()) {
+            if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+            String name = toKebab(f.getName());
+            String fullKey = prefix.isEmpty() ? name : prefix + "." + name;
+            try {
+                Object val = f.get(instance);
+                if (val instanceof String s) {
+                    messageMap.put(fullKey, s);
+                } else if (val != null && f.getType().isAnnotationPresent(de.exlll.configlib.Configuration.class)) {
+                    scanFields(fullKey, val, f.getType());
+                }
+            } catch (Exception ignored) {}
+        }
+    }
+
+    /** camelCase → kebab-case */
+    private static String toKebab(String camel) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : camel.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                if (!sb.isEmpty()) sb.append('-');
+                sb.append(Character.toLowerCase(c));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     public void saveConfig() {
@@ -69,7 +106,7 @@ public class ConfigurationManager {
     public Component component(String key, Object... args) {
         String template = resolveMessage(key);
         if (template == null) {
-            String fallback = messages != null ? messages.getMissingKeyFallback() : null;
+            String fallback = messages != null ? messages.getInternal().getMissingKeyFallback() : null;
             return Component.text(fallback != null ? String.format(fallback, key) : "<missing: " + key + ">");
         }
         String formatted = args.length > 0 ? String.format(template, escapeArgs(args)) : template;
@@ -80,8 +117,9 @@ public class ConfigurationManager {
      * 获取带前缀的 Component
      */
     public Component prefixed(String key, Object... args) {
-        String prefix = messages != null ? messages.getPrefix() : "[KittySnap]";
-        return Component.text(prefix + " ").append(component(key, args));
+        String rawPrefix = messages != null ? messages.getPrefix() : "[KittySnap]";
+        Component prefixComp = safeDeserialize(rawPrefix);
+        return prefixComp.append(Component.text(" ")).append(component(key, args));
     }
 
     // -------------------- 控制台日志 --------------------
@@ -92,7 +130,7 @@ public class ConfigurationManager {
     public String raw(String key, Object... args) {
         String template = resolveMessage(key);
         if (template == null) {
-            String fallback = messages != null ? messages.getMissingKeyFallback() : null;
+            String fallback = messages != null ? messages.getInternal().getMissingKeyFallback() : null;
             return (fallback != null) ? String.format(fallback, key) : "<missing: " + key + ">";
         }
         String formatted = args.length > 0 ? String.format(template, escapeArgs(args)) : template;
@@ -157,53 +195,16 @@ public class ConfigurationManager {
 
     // -------------------- 内部 --------------------
 
-    /**
-     * 通过反射从 MessagesConfig 中读取字段值
-     */
+    /** 从扁平消息映射中查找键 */
     private String resolveMessage(String key) {
-        Method getter = messageGetters.get(key);
-        if (getter == null) {
-            // kebab-case → camelCase getter: "ws-connecting" → "getWsConnecting"
-            String getterName = toGetterName(key);
-            try {
-                getter = MessagesConfig.class.getMethod(getterName);
-                getter.setAccessible(true);
-                messageGetters.put(key, getter);
-            } catch (NoSuchMethodException e) {
-                plugin.getLogger().warning(() -> messages != null
-                        ? String.format(messages.getMissingMessageKey(), key)
-                        : "Missing message key(s) in messages.yml: " + key);
-                return null;
-            }
+        String template = messageMap.get(key);
+        if (template == null) {
+            plugin.getLogger().warning(() -> {
+                String fallback = messages != null ? messages.getInternal().getMissingMessageKey() : null;
+                return fallback != null ? String.format(fallback, key) : "Missing message key: " + key;
+            });
         }
-        try {
-            Object value = getter.invoke(messages);
-            return value instanceof String s ? s : null;
-        } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING, messages != null
-                    ? String.format(messages.getReadMessageFailed(), key)
-                    : "Try to read the message " + key + " failed", e);
-            return null;
-        }
-    }
-
-    /**
-     * "ws-connecting" → "getWsConnecting"
-     */
-    private static String toGetterName(String kebabKey) {
-        StringBuilder sb = new StringBuilder("get");
-        boolean nextUpper = true;
-        for (char c : kebabKey.toCharArray()) {
-            if (c == '-') {
-                nextUpper = true;
-            } else if (nextUpper) {
-                sb.append(Character.toUpperCase(c));
-                nextUpper = false;
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
+        return template;
     }
 
     // -------------------- 代理方法：KittySnapConfig 常用配置 --------------------
@@ -330,6 +331,6 @@ public class ConfigurationManager {
      * 获取日志消息格式的文本，使用 MessagesConfig 的 logGroupMsgFormat 键。
      */
     public String logGroupMsgFormat(long groupId, long userId, String content) {
-        return String.format(getMessages().getLogGroupMsgFormat(), groupId, userId, content);
+        return String.format(getMessages().getInternal().getLogGroupMsgFormat(), groupId, userId, content);
     }
 }

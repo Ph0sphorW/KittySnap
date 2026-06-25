@@ -35,7 +35,7 @@ class WsListener implements WebSocket.Listener {
 
     @Override
     public void onOpen(WebSocket ws) {
-        cfg.logInfo("ws-opened");
+        cfg.logInfo("websocket.opened");
         // 确保 executor 可用（安全网：万一 doConnect 时的 executor 后续被关闭）
         client.ensureExecutor();
         // ★ 关键：请求接收帧数据
@@ -77,7 +77,7 @@ class WsListener implements WebSocket.Listener {
     @Override
     public CompletionStage<?> onClose(WebSocket ws, int code, String reason) {
         client.connected = false;
-        cfg.logInfo("ws-closed", code, reason != null ? reason : "");
+        cfg.logInfo("websocket.closed", code, reason != null ? reason : "");
         plugin.getLogger().fine("[WS-LISTENER] onClose: WebSocket 已关闭, code=" + code);
         client.scheduleReconnect();
         return CompletableFuture.completedFuture(null);
@@ -85,7 +85,7 @@ class WsListener implements WebSocket.Listener {
 
     @Override
     public void onError(WebSocket ws, Throwable error) {
-        cfg.logWarning("ws-error", error.getMessage());
+        cfg.logWarning("websocket.error", error.getMessage());
         plugin.getLogger().log(Level.WARNING, "[WS-LISTENER] onError: " + error.getMessage(), error);
     }
 

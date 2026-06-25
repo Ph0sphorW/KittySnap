@@ -117,13 +117,13 @@ public class NapcatWebSocketClient {
         } catch (Exception ignored) {
         }
         if (executor != null) executor.shutdownNow();
-        cfg.logInfo("ws-disconnected");
+        cfg.logInfo("websocket.disconnected");
     }
 
     private void doConnect() {
         ensureExecutor();
         try {
-            cfg.logInfo("ws-connecting", cfg.getWsUrl());
+            cfg.logInfo("websocket.connecting", cfg.getWsUrl());
             var builder = httpClient.newWebSocketBuilder()
                     .connectTimeout(Duration.ofSeconds(cfg.getNapcatConnectTimeout()));
             String token = cfg.getNapcatToken();
@@ -134,17 +134,17 @@ public class NapcatWebSocketClient {
                     .thenAccept(ws -> {
                         this.webSocket = ws;
                         this.connected = true;
-                        cfg.logInfo("ws-connected", cfg.getWsUrl());
+                        cfg.logInfo("websocket.connected", cfg.getWsUrl());
                         sender.flushPending();
                     })
                     .exceptionally(ex -> {
-                        cfg.logWarning("ws-connect-failed", ex.getMessage());
+                        cfg.logWarning("websocket.connect-failed", ex.getMessage());
                         this.connected = false;
                         scheduleReconnect();
                         return null;
                     });
         } catch (Exception e) {
-            cfg.logWarning("ws-connect-error");
+            cfg.logWarning("websocket.connect-error");
             plugin.getLogger().log(Level.WARNING, "", e);
             scheduleReconnect();
         }
@@ -153,7 +153,7 @@ public class NapcatWebSocketClient {
     void scheduleReconnect() {
         if (!autoReconnect || !plugin.isEnabled() || reconnectScheduled) return;
         reconnectScheduled = true;
-        cfg.logInfo("ws-reconnecting", cfg.getReconnectDelay());
+        cfg.logInfo("websocket.reconnecting", cfg.getReconnectDelay());
         reconnectTaskId = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
             reconnectScheduled = false;
             reconnectTaskId = -1;

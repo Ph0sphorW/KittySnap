@@ -20,21 +20,21 @@ public class ImageHandler {
         boolean isGif = summary != null && !summary.isEmpty();
 
         // 动图不生成预览
-        if (isGif) return m.getSegmentImageGifText();
-        if (url == null || url.isEmpty()) return m.getSegmentImageText();
+        if (isGif) return m.getSegment().getImageGifText();
+        if (url == null || url.isEmpty()) return m.getSegment().getImageText();
 
         // ImagePreviewer 可用自动异步加载
         if (ImagePreviewerIntegration.isAvailable()) {
             ImagePreviewerIntegration.previewForPlayers(url, Bukkit.getOnlinePlayers());
-            return m.getSegmentImageText();
+            return m.getSegment().getImageText();
         }
 
         // 未加载则降级为可点击的命令
         String safeUrl = url.replace("\\", "\\\\").replace("'", "\\'");
         String hover = safeUrl.length() <= HOVER_MAX ? safeUrl : safeUrl.substring(0, HOVER_MAX) + "...";
         return "<click:run_command:'/imagepreviewer preview " + safeUrl + "'>"
-                + "<hover:show_text:'" + m.getSegmentImagePreviewHover() + "\n<dark_gray>" + hover + "</dark_gray>'>"
-                + m.getSegmentImageText()
+                + "<hover:show_text:'" + m.getSegment().getImagePreviewHover() + "\n<dark_gray>" + hover + "</dark_gray>'>"
+                + m.getSegment().getImageText()
                 + "</hover></click>";
     }
 }

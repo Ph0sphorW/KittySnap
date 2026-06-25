@@ -42,7 +42,7 @@ public class MessageRepository {
                     group_id    BIGINT       NOT NULL,
                     user_id     BIGINT       NOT NULL,
                     nickname    VARCHAR(128),
-                    processed_message TEXT         NOT NULL,
+                    raw_message TEXT         NOT NULL,
                     message_id  BIGINT,
                     message_seq VARCHAR(64),
                     msg_time    BIGINT,
@@ -54,9 +54,9 @@ public class MessageRepository {
         try (Connection conn = pool.getConnection(); Statement st = conn.createStatement()) {
             st.execute(sql);
             st.execute(idx);
-            cfg.logInfo("db-table-created", tableName);
+            cfg.logInfo("database.table-created", tableName);
         } catch (SQLException e) {
-            cfg.logSevere("db-table-create-failed");
+            cfg.logSevere("database.table-create-failed");
             java.util.logging.Logger.getGlobal().log(Level.SEVERE, "", e);
         }
     }
@@ -64,11 +64,11 @@ public class MessageRepository {
     /**
      * 插入消息，返回 ID 或 -1
      */
-    boolean insert(long groupId, long userId, String nickname, String processedMessage,
+    boolean insert(long groupId, long userId, String nickname, String rawMessage,
                    long messageId, String messageSeq, long msgTime) {
         if (!pool.isReady()) return false;
 
-        String sql = "INSERT INTO %s (group_id, user_id, nickname, processed_message, message_id, message_seq, msg_time) "
+        String sql = "INSERT INTO %s (group_id, user_id, nickname, raw_message, message_id, message_seq, msg_time) "
                 .formatted(tableName) + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         long start = System.currentTimeMillis();
@@ -80,7 +80,7 @@ public class MessageRepository {
             ps.setLong(1, groupId);
             ps.setLong(2, userId);
             ps.setString(3, nickname != null && nickname.length() > trunc ? nickname.substring(0, trunc) : nickname);
-            ps.setString(4, processedMessage);
+            ps.setString(4, rawMessage);
             ps.setLong(5, messageId);
             ps.setString(6, messageSeq);
             ps.setLong(7, msgTime);
@@ -92,8 +92,8 @@ public class MessageRepository {
                 if (rs.next()) id = rs.getLong(1);
             }
 
-            cfg.logInfo("db-insert-message", groupId, userId, id);
-            debug("debug-db-insert", groupId, userId, processedMessage, id, elapsed);
+            cfg.logInfo("database.insert-message", groupId, userId, id);
+            debug("debug-db-insert", groupId, userId, rawMessage, id, elapsed);
 
             var stats = pool.getPoolStats();
             debug("debug-db-pool", stats.active(), stats.idle(), stats.waiting());
@@ -101,7 +101,7 @@ public class MessageRepository {
             return true;
 
         } catch (SQLException e) {
-            cfg.logWarning("db-insert-error", e.getMessage());
+            cfg.logWarning("database.insert-error", e.getMessage());
             java.util.logging.Logger.getGlobal().log(Level.WARNING, "", e);
             return false;
         }
@@ -117,7 +117,7 @@ public class MessageRepository {
      */
     public OriginalMessage queryByMessageId(long groupId, long messageId) {
         if (!pool.isReady()) return null;
-        String sql = "SELECT nickname, processed_message FROM %s WHERE group_id = ? AND message_id = ? LIMIT 1"
+        String sql = "SELECT nickname, raw_message FROM %s WHERE group_id = ? AND message_id = ? LIMIT 1"
                 .formatted(tableName);
         try (Connection conn = pool.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -126,10 +126,10 @@ public class MessageRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String nick = rs.getString("nickname");
-                    String processed = rs.getString("processed_message");
-                    if (nick == null) nick = cfg.getMessages().getDbUnknownSender();
-                    if (processed == null) processed = "";
-                    return new OriginalMessage(nick, processed);
+                    String raw = rs.getString("raw_message");
+                    if (nick == null) nick = cfg.getMessages().getInternal().getUnknownSender();
+                    if (raw == null) raw = "";
+                    return new OriginalMessage(nick, raw);
                 }
             }
         } catch (SQLException e) {
@@ -141,14 +141,14 @@ public class MessageRepository {
     /**
      * 原始消息查询结果
      */
-    public record OriginalMessage(String senderName, String processedMessage) {
+    public record OriginalMessage(String senderName, String rawMessage) {
         /**
          * 用于展示的摘要文本，maxLen 为最大长度
          */
         public String summary(int maxLen) {
-            if (processedMessage == null || processedMessage.isEmpty()) return "";
-            if (processedMessage.length() <= maxLen) return processedMessage;
-            return processedMessage.substring(0, maxLen) + "...";
+            if (rawMessage == null || rawMessage.isEmpty()) return "";
+            if (rawMessage.length() <= maxLen) return rawMessage;
+            return rawMessage.substring(0, maxLen) + "...";
         }
     }
 }

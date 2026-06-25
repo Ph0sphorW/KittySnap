@@ -39,18 +39,18 @@ public class ConnectionPoolManager {
         try {
             dataSource = new HikariDataSource(hk);
         } catch (Exception e) {
-            cfg.logSevere("db-connect-error", e.getMessage());
+            cfg.logSevere("database.connect-error", e.getMessage());
             return false;
         }
 
         // 测试连接
         try (Connection conn = getConnection()) {
             if (conn == null) {
-                cfg.logSevere("db-connect-error", "Database connection error");
+                cfg.logSevere("database.connect-error", "Database connection error");
                 return false;
             }
         } catch (SQLException e) {
-            cfg.logSevere("db-connect-error", e.getMessage());
+            cfg.logSevere("database.connect-error", e.getMessage());
             return false;
         }
 
@@ -61,6 +61,7 @@ public class ConnectionPoolManager {
         if (dataSource == null || dataSource.isClosed()) return null;
         return dataSource.getConnection();
     }
+
 
     boolean isReady() {
         return dataSource != null && !dataSource.isClosed();

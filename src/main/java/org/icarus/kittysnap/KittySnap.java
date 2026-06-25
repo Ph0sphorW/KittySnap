@@ -70,13 +70,13 @@ public final class KittySnap extends JavaPlugin {
             napcatClient.addGroups(configGroups, new QQToGameBroadcaster(configManager));
         }
 
-        configManager.logInfo("config-reloaded");
+        configManager.logInfo("plugin.config-reloaded");
     }
 
     @Override
     public void onEnable() {
         configManager = new ConfigurationManager(this);
-        configManager.logInfo("plugin-enabled");
+        configManager.logInfo("plugin.enabled");
 
         napcatClient = new NapcatWebSocketClient(this, configManager);
 
@@ -97,14 +97,14 @@ public final class KittySnap extends JavaPlugin {
             cmd.setExecutor(commandExecutor);
             cmd.setTabCompleter(commandExecutor);
         } else {
-            configManager.logWarning("command-register-failed");
+            configManager.logWarning("internal.command-register-failed");
         }
 
         var listenGroups = configManager.getListenGroups();
         if (!listenGroups.isEmpty()) {
             napcatClient.addGroups(listenGroups, new QQToGameBroadcaster(configManager));
         } else {
-            configManager.logWarning("no-listen-groups-configured");
+            configManager.logWarning("internal.no-listen-groups-configured");
         }
 
         napcatClient.connect();
@@ -112,9 +112,9 @@ public final class KittySnap extends JavaPlugin {
         if (configManager.isChatForwardEnabled()) {
             chatForwarder = new ChatToGroupForwarder(napcatClient, configManager);
             getServer().getPluginManager().registerEvents(chatForwarder, this);
-            configManager.logInfo("chat-forward-enabled");
+            configManager.logInfo("chat-forward.enabled");
         } else {
-            configManager.logInfo("chat-forward-disabled");
+            configManager.logInfo("chat-forward.disabled");
         }
     }
 
@@ -129,7 +129,7 @@ public final class KittySnap extends JavaPlugin {
             databaseManager = null;
         }
         if (configManager != null) {
-            configManager.logInfo("plugin-disabled");
+            configManager.logInfo("plugin.disabled");
         }
     }
 }

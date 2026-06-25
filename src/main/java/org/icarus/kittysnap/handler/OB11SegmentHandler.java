@@ -5,6 +5,7 @@ import org.icarus.kittysnap.config.MessagesConfig;
 import org.icarus.kittysnap.database.DatabaseManager;
 import org.icarus.kittysnap.handler.handlers.BuildResult;
 import org.icarus.kittysnap.handler.handlers.AtFormatter;
+import org.icarus.kittysnap.handler.handlers.CardHandler;
 import org.icarus.kittysnap.handler.handlers.ImageHandler;
 import org.icarus.kittysnap.handler.handlers.QQFaceMapper;
 import org.icarus.kittysnap.handler.handlers.ReplyFormatter;
@@ -38,16 +39,15 @@ public record OB11SegmentHandler(NapcatWebSocketClient napcatClient, Configurati
         return switch (segment) {
             case OB11MessageText t -> esc(t.getText());
             case OB11MessageAt at -> AtFormatter.handleAt(napcatClient, at, groupId, m);
-            // TODO 更完善的表情列表
             case OB11MessageFace face -> {
                 String fn = QQFaceMapper.getName(face.getFaceId());
                 yield fn != null ? "[" + fn + "]" : "[表情" + face.getFaceId() + "]";
             }
             case OB11MessageImage img -> ImageHandler.handleImage(img, m);
-            // TODO 卡片消息网址解析
-            case OB11MessageJson ignored -> m.getSegmentCardText();
-            case OB11MessageMarkdown ignored -> m.getSegmentMarkdownText();
-            case OB11MessageUnknown ignored -> m.getSegmentUnknownText();
+            // 卡片消息网址解析
+            case OB11MessageJson json -> CardHandler.handleJson(json, m);
+            case OB11MessageMarkdown ignored -> m.getSegment().getMarkdownText();
+            case OB11MessageUnknown ignored -> m.getSegment().getUnknownText();
             default -> "";
         };
     }

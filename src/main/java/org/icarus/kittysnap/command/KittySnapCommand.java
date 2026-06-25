@@ -32,8 +32,8 @@ public class KittySnapCommand implements TabExecutor {
     );
 
     private static final List<String> SUBCOMMAND_DESC_KEYS = Arrays.asList(
-            "addgroup-desc", "delgroup-desc", "reconnect-desc",
-            "send-desc", "debug-desc", "reload-desc"
+            "command.addgroup-desc", "command.delgroup-desc", "command.reconnect-desc",
+            "command.send-desc", "command.debug-desc", "command.reload-desc"
     );
 
     private final KittySnap plugin;
@@ -47,7 +47,7 @@ public class KittySnapCommand implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
         if (!sender.hasPermission("kittysnap.admin")) {
-            sender.sendMessage(cfg.prefixed("no-permission"));
+            sender.sendMessage(cfg.prefixed("command.no-permission"));
             return true;
         }
 
@@ -65,7 +65,7 @@ public class KittySnapCommand implements TabExecutor {
             case "debug" -> handleDebug(sender);
             case "reload" -> handleReload(sender);
             default -> {
-                sender.sendMessage(cfg.prefixed("unknown-subcommand", sub));
+                sender.sendMessage(cfg.prefixed("command.unknown-subcommand", sub));
                 sendHelp(sender, label);
                 yield true;
             }
@@ -77,7 +77,7 @@ public class KittySnapCommand implements TabExecutor {
     @SuppressWarnings("SameReturnValue")
     private boolean handleAddGroup(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(cfg.prefixed("addgroup-usage"));
+            sender.sendMessage(cfg.prefixed("command.addgroup-usage"));
             return true;
         }
         long groupId = parseGroupId(args[1], sender);
@@ -86,23 +86,21 @@ public class KittySnapCommand implements TabExecutor {
         // 保存到配置文件，已存在就跳出
         boolean added = cfg.addListenGroup(groupId);
         if (!added) {
-            sender.sendMessage(cfg.prefixed("addgroup-already-exists", groupId));
+            sender.sendMessage(cfg.prefixed("internal.addgroup-already-exists", groupId));
             return true;
         }
 
         // 注册监听
-        plugin.getNapcatClient().addGroup(groupId, (napMsg, gid, uid, content) -> {
-            plugin.getLogger().info(cfg.logGroupMsgFormat(gid, uid, content));
-        });
+        plugin.getNapcatClient().addGroup(groupId, (napMsg, gid, uid, content) -> plugin.getLogger().info(cfg.logGroupMsgFormat(gid, uid, content)));
 
-        sender.sendMessage(cfg.prefixed("addgroup-done", groupId));
+        sender.sendMessage(cfg.prefixed("command.addgroup-done", groupId));
         return true;
     }
 
     @SuppressWarnings("SameReturnValue")
     private boolean handleDelGroup(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(cfg.prefixed("delgroup-usage"));
+            sender.sendMessage(cfg.prefixed("command.delgroup-usage"));
             return true;
         }
         long groupId = parseGroupId(args[1], sender);
@@ -111,19 +109,19 @@ public class KittySnapCommand implements TabExecutor {
         // 从配置文件移除
         boolean removed = cfg.removeListenGroup(groupId);
         if (!removed) {
-            sender.sendMessage(cfg.prefixed("delgroup-not-found", groupId));
+            sender.sendMessage(cfg.prefixed("command.delgroup-not-found", groupId));
             return true;
         }
 
         // 从运行时移除
         plugin.getNapcatClient().removeGroup(groupId);
 
-        sender.sendMessage(cfg.prefixed("delgroup-done", groupId));
+        sender.sendMessage(cfg.prefixed("command.delgroup-done", groupId));
         return true;
     }
 
     private boolean handleReconnect(CommandSender sender) {
-        sender.sendMessage(cfg.prefixed("reconnect-done"));
+        sender.sendMessage(cfg.prefixed("command.reconnect-done"));
         plugin.getNapcatClient().reconnect();
         return true;
     }
@@ -131,7 +129,7 @@ public class KittySnapCommand implements TabExecutor {
     @SuppressWarnings("SameReturnValue")
     private boolean handleSend(CommandSender sender, String[] args) {
         if (args.length < 3) {
-            sender.sendMessage(cfg.prefixed("send-usage"));
+            sender.sendMessage(cfg.prefixed("command.send-usage"));
             return true;
         }
 
@@ -141,7 +139,7 @@ public class KittySnapCommand implements TabExecutor {
         // 检查群是否在监听列表
         Set<Long> monitored = plugin.getNapcatClient().getMonitoredGroups();
         if (!monitored.contains(groupId)) {
-            sender.sendMessage(cfg.prefixed("send-not-monitored", groupId));
+            sender.sendMessage(cfg.prefixed("command.send-not-monitored", groupId));
             return true;
         }
 
@@ -149,7 +147,7 @@ public class KittySnapCommand implements TabExecutor {
         String message = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
         plugin.getNapcatClient().sendGroupMessage(groupId, message);
-        sender.sendMessage(cfg.prefixed("send-done", groupId));
+        sender.sendMessage(cfg.prefixed("command.send-done", groupId));
         return true;
     }
 
@@ -158,16 +156,16 @@ public class KittySnapCommand implements TabExecutor {
         plugin.setDebugMode(newState);
 
         if (newState) {
-            sender.sendMessage(cfg.prefixed("debug-toggled-on"));
+            sender.sendMessage(cfg.prefixed("command.debug-toggled-on"));
         } else {
-            sender.sendMessage(cfg.prefixed("debug-toggled-off"));
+            sender.sendMessage(cfg.prefixed("command.debug-toggled-off"));
         }
         return true;
     }
 
     private boolean handleReload(CommandSender sender) {
         plugin.reload();
-        sender.sendMessage(cfg.prefixed("reload-done"));
+        sender.sendMessage(cfg.prefixed("command.reload-done"));
         return true;
     }
 
@@ -206,12 +204,12 @@ public class KittySnapCommand implements TabExecutor {
     // -------------------- 工具 --------------------
 
     private void sendHelp(CommandSender sender, String label) {
-        sender.sendMessage(cfg.prefixed("usage-header"));
+        sender.sendMessage(cfg.prefixed("command.usage-header"));
         for (int i = 0; i < SUBCOMMANDS.size(); i++) {
-            sender.sendMessage(cfg.prefixed("usage-line",
+            sender.sendMessage(cfg.prefixed("command.usage-line",
                     label, SUBCOMMANDS.get(i), cfg.raw(SUBCOMMAND_DESC_KEYS.get(i))));
         }
-        sender.sendMessage(cfg.prefixed("usage-footer"));
+        sender.sendMessage(cfg.prefixed("command.usage-footer"));
     }
 
     private long parseGroupId(String input, CommandSender sender) {
@@ -220,7 +218,7 @@ public class KittySnapCommand implements TabExecutor {
             if (id <= 0) throw new NumberFormatException();
             return id;
         } catch (NumberFormatException e) {
-            sender.sendMessage(cfg.prefixed("invalid-group-id", input));
+            sender.sendMessage(cfg.prefixed("internal.invalid-group-id", input));
             return 0;
         }
     }

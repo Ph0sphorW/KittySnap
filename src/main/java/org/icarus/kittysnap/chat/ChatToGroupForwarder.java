@@ -56,6 +56,6 @@ public class ChatToGroupForwarder implements Listener {
             }
         }
 
-        cfg.logFine("chat-forwarded", player.getName(), forwardText);
+        cfg.logFine("chat-forward.forwarded", player.getName(), forwardText);
     }
 }

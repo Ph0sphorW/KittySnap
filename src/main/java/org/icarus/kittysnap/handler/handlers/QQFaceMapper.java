@@ -664,7 +664,10 @@ public enum QQFaceMapper {
     private final long id;
     private final String name;
 
-    QQFaceMapper(long id, String name) { this.id = id; this.name = name; }
+    QQFaceMapper(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public static String getName(long id) {
         return NAME_MAP.getOrDefault(id, null);

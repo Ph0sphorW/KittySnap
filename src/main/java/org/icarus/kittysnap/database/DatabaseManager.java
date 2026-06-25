@@ -23,16 +23,16 @@ public class DatabaseManager {
      */
     @SuppressWarnings("UnusedReturnValue")
     public boolean init() {
-        cfg.logInfo("db-initializing");
+        cfg.logInfo("database.initializing");
         if (!pool.init()) return false;
         messageRepo.createTable();
-        cfg.logInfo("db-initialized");
+        cfg.logInfo("database.initialized");
         return true;
     }
 
     public void shutdown() {
         pool.shutdown();
-        cfg.logInfo("db-shutdown");
+        cfg.logInfo("database.shutdown");
     }
 
     public void setDebugConsumer(BiConsumer<String, Object[]> consumer) {
@@ -40,9 +40,9 @@ public class DatabaseManager {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public boolean insertGroupMessage(long groupId, long userId, String nickname, String processedMessage,
+    public boolean insertGroupMessage(long groupId, long userId, String nickname, String rawMessage,
                                    long messageId, String messageSeq, long msgTime) {
-        return messageRepo.insert(groupId, userId, nickname, processedMessage, messageId, messageSeq, msgTime);
+        return messageRepo.insert(groupId, userId, nickname, rawMessage, messageId, messageSeq, msgTime);
     }
 
     /**

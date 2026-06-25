@@ -8,15 +8,15 @@ import static org.icarus.kittysnap.handler.Escape.esc;
 
 public class AtFormatter {
     public static String handleAt(NapcatWebSocketClient napcatClient, OB11MessageAt at, long groupId, MessagesConfig m) {
-        if (at.isAtAll()) return m.getSegmentAtAll();
+        if (at.isAtAll()) return m.getSegment().getAtAll();
         String target = at.getTarget();
         if (target == null || target.isEmpty()) return "";
 
         long uid = at.getTargetUserId();
         if (uid > 0) {
             String name = napcatClient.queryGroupMemberName(groupId, uid);
-            if (name != null) return m.getSegmentAtPrefix() + esc(name);
+            if (name != null) return m.getSegment().getAtPrefix() + esc(name);
         }
-        return m.getSegmentAtPrefix() + target;
+        return m.getSegment().getAtPrefix() + target;
     }
 }
