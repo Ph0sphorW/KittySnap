@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.function.BiConsumer;
-import java.util.logging.Level;
 
 public class MessageRepository {
 
@@ -56,8 +55,7 @@ public class MessageRepository {
             st.execute(idx);
             cfg.logInfo("database.table-created", tableName);
         } catch (SQLException e) {
-            cfg.logSevere("database.table-create-failed");
-            java.util.logging.Logger.getGlobal().log(Level.SEVERE, "", e);
+            cfg.logSevere("database.table-create-failed", e);
         }
     }
 
@@ -101,8 +99,7 @@ public class MessageRepository {
             return true;
 
         } catch (SQLException e) {
-            cfg.logWarning("database.insert-error", e.getMessage());
-            java.util.logging.Logger.getGlobal().log(Level.WARNING, "", e);
+            cfg.logWarning("database.insert-error", e, e.getMessage());
             return false;
         }
     }
@@ -133,7 +130,7 @@ public class MessageRepository {
                 }
             }
         } catch (SQLException e) {
-            java.util.logging.Logger.getGlobal().log(Level.WARNING, "查询原始消息失败 [message_id=" + messageId + "]", e);
+            cfg.logWarning("database.query-failed", e, messageId);
         }
         return null;
     }

@@ -33,7 +33,9 @@ public class ConfigurationManager {
     @Getter
     private MessagesConfig messages;
 
-    /** 扁平化消息映射: "section.field" → 模板字符串 */
+    /**
+     * 扁平化消息映射: "section.field" → 模板字符串
+     */
     private final Map<String, String> messageMap = new HashMap<>();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -58,7 +60,9 @@ public class ConfigurationManager {
         rebuildMessageMap();
     }
 
-    /** 递归扫描 MessagesConfig 嵌套结构，构建扁平键→值映射 */
+    /**
+     * 递归扫描 MessagesConfig 嵌套结构，构建扁平键→值映射
+     */
     private void rebuildMessageMap() {
         messageMap.clear();
         scanFields("", messages, messages.getClass());
@@ -76,11 +80,14 @@ public class ConfigurationManager {
                 } else if (val != null && f.getType().isAnnotationPresent(de.exlll.configlib.Configuration.class)) {
                     scanFields(fullKey, val, f.getType());
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
-    /** camelCase → kebab-case */
+    /**
+     * camelCase → kebab-case
+     */
     private static String toKebab(String camel) {
         StringBuilder sb = new StringBuilder();
         for (char c : camel.toCharArray()) {
@@ -193,9 +200,19 @@ public class ConfigurationManager {
         plugin.getLogger().fine(raw(key, args));
     }
 
+    public void logWarning(String key, Throwable t, Object... args) {
+        plugin.getLogger().log(Level.WARNING, raw(key, args), t);
+    }
+
+    public void logSevere(String key, Throwable t, Object... args) {
+        plugin.getLogger().log(Level.SEVERE, raw(key, args), t);
+    }
+
     // -------------------- 内部 --------------------
 
-    /** 从扁平消息映射中查找键 */
+    /**
+     * 从扁平消息映射中查找键
+     */
     private String resolveMessage(String key) {
         String template = messageMap.get(key);
         if (template == null) {

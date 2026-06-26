@@ -29,9 +29,6 @@ public final class KittySnapConfig {
         @Comment("连接超时时间（秒）")
         public int connectTimeout = 10;
 
-        @Comment("心跳超时时间（秒），超过此时间未收到心跳包则强制重连")
-        public int heartbeatTimeout = 30;
-
         @Comment("自动重连延迟（秒），最小 1 秒")
         public int reconnectDelay = 5;
 

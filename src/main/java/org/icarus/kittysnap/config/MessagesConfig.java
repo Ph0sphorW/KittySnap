@@ -151,6 +151,7 @@ public final class MessagesConfig {
         public String poolInitFailed = "<#FFFF99>数据库连接池初始化失败。";
         public String tableCreateFailed = "<#FFFF99>创建数据表失败。";
         public String insertFailed = "<#FFFF99>插入消息到数据库失败。";
+        public String queryFailed = "<#FFFF99>查询原始消息失败 [message_id=%d]";
     }
 
     // ==================== 内部 ====================

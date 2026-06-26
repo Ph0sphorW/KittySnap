@@ -7,6 +7,8 @@ import org.bukkit.util.StringUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.icarus.kittysnap.KittySnap;
 import org.icarus.kittysnap.config.ConfigurationManager;
+import org.icarus.kittysnap.napcat.IGroupMessageListener;
+import org.icarus.kittysnap.napcat.onebotapi.OB11Message;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,8 +92,8 @@ public class KittySnapCommand implements TabExecutor {
             return true;
         }
 
-        // 注册监听
-        plugin.getNapcatClient().addGroup(groupId, (napMsg, gid, uid, content) -> plugin.getLogger().info(cfg.logGroupMsgFormat(gid, uid, content)));
+        // 注册监听（使用具名类，支持后续通过 removeListenersByType 清理）
+        plugin.getNapcatClient().addGroup(groupId, new LoggingGroupListener(plugin));
 
         sender.sendMessage(cfg.prefixed("command.addgroup-done", groupId));
         return true;
@@ -229,5 +231,24 @@ public class KittySnapCommand implements TabExecutor {
                 .map(String::valueOf)
                 .filter(id -> id.startsWith(partial))
                 .collect(Collectors.toList());
+    }
+
+    // ==================== 具名监听器（避免 lambda 无法被 removeListenersByType 清理） ====================
+
+    /**
+     * 仅记录日志的群消息监听器，用于 /kittysnap addgroup 注册。<br>
+     * 使用具名类而非 lambda，使得 {@code removeListenersByType(LoggingGroupListener.class)} 可正常清理。
+     */
+    public static class LoggingGroupListener implements IGroupMessageListener {
+        private final KittySnap plugin;
+
+        LoggingGroupListener(KittySnap plugin) {
+            this.plugin = plugin;
+        }
+
+        @Override
+        public void onGroupMessage(OB11Message message, long groupId, long userId, String content) {
+            plugin.getLogger().info(plugin.getConfigManager().logGroupMsgFormat(groupId, userId, content));
+        }
     }
 }

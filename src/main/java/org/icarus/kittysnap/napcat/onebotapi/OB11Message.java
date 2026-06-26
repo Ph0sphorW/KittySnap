@@ -73,8 +73,6 @@ public class OB11Message {
                 this.segments = Collections.emptyList();
                 return;
             }
-
-
             // 包装为 text 段
             case String text -> {
                 this.segments = Collections.singletonList(
@@ -82,8 +80,6 @@ public class OB11Message {
                 );
                 return;
             }
-
-
             // 数组格式
             case JSONArray arr -> {
                 List<OB11Segment> list = getOB11Segments(arr);

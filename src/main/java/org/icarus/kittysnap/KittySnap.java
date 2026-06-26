@@ -8,6 +8,7 @@ import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
 import org.icarus.kittysnap.chat.ChatToGroupForwarder;
 import org.icarus.kittysnap.chat.QQToGameBroadcaster;
 import org.icarus.kittysnap.command.KittySnapCommand;
+import org.icarus.kittysnap.command.KittySnapCommand.LoggingGroupListener;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
 import org.icarus.kittysnap.napcat.handler.SegmentHandler;
@@ -71,6 +72,7 @@ public final class KittySnap extends JavaPlugin {
 
         // 清理已存在，防止反复注册
         napcatClient.removeListenersByType(QQToGameBroadcaster.class);
+        napcatClient.removeListenersByType(LoggingGroupListener.class);
 
         // 用新配置重新注册
         var configGroups = configManager.getListenGroups();
