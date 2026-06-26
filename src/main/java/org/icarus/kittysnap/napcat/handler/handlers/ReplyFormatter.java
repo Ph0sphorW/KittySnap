@@ -35,7 +35,7 @@ public class ReplyFormatter {
         StringBuilder sb = new StringBuilder();
         for (var seg : segments) {
             if (!(seg instanceof OB11MessageReply)) {
-                sb.append(handler.handle(seg, groupId));
+                sb.append(handler.handle(seg, groupId, false));
             }
         }
         String content = sb.toString().trim();

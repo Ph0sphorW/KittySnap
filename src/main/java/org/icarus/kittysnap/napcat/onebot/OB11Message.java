@@ -30,6 +30,8 @@ public class OB11Message {
     @JSONField(name = "group_id")
     private long groupId;
 
+    @JSONField(name = "message_format")
+    private String messageFormat;
     /**
      * 发送者 QQ 号，user_id
      */
@@ -38,7 +40,6 @@ public class OB11Message {
 
     @JSONField(name = "raw_message")
     private String rawMessage;
-
     /**
      * 消息片段列表
      * 不走 json 序列化，走下面解析
@@ -55,34 +56,27 @@ public class OB11Message {
     // ---------- 消息片段解析 ----------
 
     /**
-     * 从 OneBot JSON 根对象的 "message" 字段中解析 OB11 消息段列表，并设置到本对象中。
-     * <p>
-     * "message" 字段有两种可能格式：
-     * <ul>
-     *   <li>JSON 数组 {@code [{"type":"text","data":{"text":"hi"}}]} — 标准 OB11 数组格式</li>
-     *   <li>字符串 {@code "hi"} — 仅含纯文本的简写格式</li>
-     * </ul>
-     * 此方法兼容处理两种格式，对于字符串格式会包装为单个 text 段。
+     * 解析 OB11 消息段列表
+     * 兼容处理两种格式，对于字符串格式会包装为单个 text 段。
      *
-     * @param root OneBot JSON 根对象
+     * @param root OneBotJSON 对象
      */
     public void parseMessageSegments(JSONObject root) {
         Object messageField = root.get("message");
-        switch (messageField) {
+        String type = root.getString("message_format");
+        switch (type) {
             case null -> {
                 this.segments = Collections.emptyList();
                 return;
             }
-            // 包装为 text 段
-            case String text -> {
+            case "string" -> {
                 this.segments = Collections.singletonList(
-                        new OB11MessageText(Collections.singletonMap("text", text))
+                        new OB11MessageText(Collections.singletonMap("text", messageField))
                 );
                 return;
             }
-            // 数组格式
-            case JSONArray arr -> {
-                List<OB11Segment> list = getOB11Segments(arr);
+            case "array" -> {
+                List<OB11Segment> list = getOB11Segments((JSONArray) messageField);
                 this.segments = Collections.unmodifiableList(list);
                 return;
             }
