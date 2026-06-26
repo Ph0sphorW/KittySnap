@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 
-class WsListener implements WebSocket.Listener {
+class WebsocketListener implements WebSocket.Listener {
 
     private final StringBuilder buf = new StringBuilder();
     private final NapcatWebSocketClient client;
@@ -22,9 +22,9 @@ class WsListener implements WebSocket.Listener {
     private final ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls;
     private final int truncateLen;
 
-    WsListener(NapcatWebSocketClient client, ConfigurationManager cfg, JavaPlugin plugin,
-               MessageDispatcher dispatcher,
-               ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls) {
+    WebsocketListener(NapcatWebSocketClient client, ConfigurationManager cfg, JavaPlugin plugin,
+                      MessageDispatcher dispatcher,
+                      ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls) {
         this.client = client;
         this.cfg = cfg;
         this.plugin = plugin;

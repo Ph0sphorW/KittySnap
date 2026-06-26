@@ -3,8 +3,8 @@ package org.icarus.kittysnap.chat;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.icarus.kittysnap.napcat.IGroupMessageListener;
-import org.icarus.kittysnap.napcat.onebotapi.OB11Message;
+import org.icarus.kittysnap.utils.listeners.IGroupMessageListener;
+import org.icarus.kittysnap.napcat.onebot.OB11Message;
 import org.icarus.kittysnap.config.ConfigurationManager;
 
 import java.time.Instant;

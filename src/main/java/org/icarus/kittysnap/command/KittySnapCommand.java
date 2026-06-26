@@ -4,11 +4,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.util.StringUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.icarus.kittysnap.utils.listeners.LoggingGroupListener;
+import org.jetbrains.annotations.NotNull;
 import org.icarus.kittysnap.KittySnap;
 import org.icarus.kittysnap.config.ConfigurationManager;
-import org.icarus.kittysnap.napcat.IGroupMessageListener;
-import org.icarus.kittysnap.napcat.onebotapi.OB11Message;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +46,10 @@ public class KittySnapCommand implements TabExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
+    public boolean onCommand(CommandSender sender,
+                             @NotNull Command command,
+                             @NotNull String label,
+                             String @NotNull [] args) {
         if (!sender.hasPermission("kittysnap.admin")) {
             sender.sendMessage(cfg.prefixed("command.no-permission"));
             return true;
@@ -92,7 +94,7 @@ public class KittySnapCommand implements TabExecutor {
             return true;
         }
 
-        // 注册监听（使用具名类，支持后续通过 removeListenersByType 清理）
+        // 注册监听
         plugin.getNapcatClient().addGroup(groupId, new LoggingGroupListener(plugin));
 
         sender.sendMessage(cfg.prefixed("command.addgroup-done", groupId));
@@ -175,9 +177,9 @@ public class KittySnapCommand implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender,
-                                      @NonNull Command command,
-                                      @NonNull String alias,
-                                      String @NonNull [] args) {
+                                      @NotNull Command command,
+                                      @NotNull String alias,
+                                      String @NotNull [] args) {
         if (!sender.hasPermission("kittysnap.admin")) {
             return Collections.emptyList();
         }
@@ -233,22 +235,4 @@ public class KittySnapCommand implements TabExecutor {
                 .collect(Collectors.toList());
     }
 
-    // ==================== 具名监听器（避免 lambda 无法被 removeListenersByType 清理） ====================
-
-    /**
-     * 仅记录日志的群消息监听器，用于 /kittysnap addgroup 注册。<br>
-     * 使用具名类而非 lambda，使得 {@code removeListenersByType(LoggingGroupListener.class)} 可正常清理。
-     */
-    public static class LoggingGroupListener implements IGroupMessageListener {
-        private final KittySnap plugin;
-
-        LoggingGroupListener(KittySnap plugin) {
-            this.plugin = plugin;
-        }
-
-        @Override
-        public void onGroupMessage(OB11Message message, long groupId, long userId, String content) {
-            plugin.getLogger().info(plugin.getConfigManager().logGroupMsgFormat(groupId, userId, content));
-        }
-    }
 }

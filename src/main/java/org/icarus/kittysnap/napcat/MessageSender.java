@@ -3,6 +3,7 @@ package org.icarus.kittysnap.napcat;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import org.icarus.kittysnap.config.ConfigurationManager;
+import org.icarus.kittysnap.utils.PendingMessage;
 
 import java.net.http.WebSocket;
 import java.util.Queue;

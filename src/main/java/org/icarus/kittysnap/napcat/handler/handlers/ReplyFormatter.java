@@ -3,10 +3,11 @@ package org.icarus.kittysnap.napcat.handler.handlers;
 import org.icarus.kittysnap.config.KittySnapConfig;
 import org.icarus.kittysnap.config.MessagesConfig;
 import org.icarus.kittysnap.database.DatabaseManager;
-import org.icarus.kittysnap.database.MessageRepository;
+import org.icarus.kittysnap.utils.OriginalMessage;
 import org.icarus.kittysnap.napcat.handler.SegmentHandler;
-import org.icarus.kittysnap.napcat.onebotapi.OB11MessageReply;
-import org.icarus.kittysnap.napcat.onebotapi.OB11Segment;
+import org.icarus.kittysnap.napcat.onebot.OB11MessageReply;
+import org.icarus.kittysnap.napcat.onebot.OB11Segment;
+import org.icarus.kittysnap.utils.BuildResult;
 
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class ReplyFormatter {
                                             DatabaseManager db,
                                             MessagesConfig config,
                                             KittySnapConfig snapConfig) {
-        MessageRepository.OriginalMessage original = db.queryOriginalMessage(groupId, replyMessageId);
+        OriginalMessage original = db.queryOriginalMessage(groupId, replyMessageId);
         if (original != null) {
             String sender = original.senderName().replace("<", "\\<");
             String summary = original.summary(snapConfig.getChatForward().getMaximumReplyingSummaryLength()).replace("<", "\\<");

@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.icarus.kittysnap.config.KittySnapConfig;
 import org.icarus.kittysnap.config.MessagesConfig;
-import org.icarus.kittysnap.napcat.onebotapi.OB11MessageImage;
+import org.icarus.kittysnap.napcat.onebot.OB11MessageImage;
 
 /**
  * 图片处理

@@ -6,9 +6,10 @@ import lombok.Setter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
-import org.icarus.kittysnap.napcat.handler.handlers.BuildResult;
+import org.icarus.kittysnap.utils.BuildResult;
 import org.icarus.kittysnap.napcat.handler.SegmentHandler;
-import org.icarus.kittysnap.napcat.onebotapi.OB11Message;
+import org.icarus.kittysnap.napcat.onebot.OB11Message;
+import org.icarus.kittysnap.utils.GroupEntry;
 
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.BiConsumer;

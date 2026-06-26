@@ -1,4 +1,6 @@
-package org.icarus.kittysnap.napcat;
+package org.icarus.kittysnap.utils;
+
+import org.icarus.kittysnap.utils.listeners.IGroupMessageListener;
 
 /**
  * 群号 → 监听器 的绑定关系。

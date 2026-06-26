@@ -1,4 +1,4 @@
-package org.icarus.kittysnap.napcat.onebotapi;
+package org.icarus.kittysnap.napcat.onebot;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;

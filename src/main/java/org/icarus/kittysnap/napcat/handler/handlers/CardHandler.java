@@ -3,7 +3,7 @@ package org.icarus.kittysnap.napcat.handler.handlers;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import org.icarus.kittysnap.config.MessagesConfig;
-import org.icarus.kittysnap.napcat.onebotapi.OB11MessageJson;
+import org.icarus.kittysnap.napcat.onebot.OB11MessageJson;
 
 /**
  * 卡片消息处理器，提取内嵌 URL

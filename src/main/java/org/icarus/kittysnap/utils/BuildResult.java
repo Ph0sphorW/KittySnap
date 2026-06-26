@@ -1,4 +1,4 @@
-package org.icarus.kittysnap.napcat.handler.handlers;
+package org.icarus.kittysnap.utils;
 
 /**
  * OB11 段列表处理结果

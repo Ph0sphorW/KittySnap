@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
 import org.icarus.kittysnap.napcat.handler.SegmentHandler;
+import org.icarus.kittysnap.utils.listeners.IGroupMessageListener;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -129,7 +130,7 @@ public class NapcatWebSocketClient {
             String token = cfg.getNapcatToken();
             if (token != null && !token.isEmpty()) builder.header("Authorization", "Bearer " + token);
             builder.buildAsync(URI.create(cfg.getWsUrl()),
-                            new WsListener(this, cfg, plugin, dispatcher, pendingApiCalls))
+                            new WebsocketListener(this, cfg, plugin, dispatcher, pendingApiCalls))
                     .orTimeout(cfg.getNapcatConnectTimeout(), TimeUnit.SECONDS)
                     .thenAccept(ws -> {
                         this.webSocket = ws;

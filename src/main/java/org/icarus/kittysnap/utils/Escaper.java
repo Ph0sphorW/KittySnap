@@ -1,4 +1,4 @@
-package org.icarus.kittysnap.napcat.handler;
+package org.icarus.kittysnap.utils;
 
 public class Escaper {
     public static String escape(String s) {

@@ -1,6 +1,8 @@
 package org.icarus.kittysnap.napcat;
 
 import org.icarus.kittysnap.config.ConfigurationManager;
+import org.icarus.kittysnap.utils.GroupEntry;
+import org.icarus.kittysnap.utils.listeners.IGroupMessageListener;
 
 import java.util.Collection;
 import java.util.HashSet;

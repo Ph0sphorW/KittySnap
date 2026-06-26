@@ -1,6 +1,6 @@
-package org.icarus.kittysnap.napcat;
+package org.icarus.kittysnap.utils.listeners;
 
-import org.icarus.kittysnap.napcat.onebotapi.OB11Message;
+import org.icarus.kittysnap.napcat.onebot.OB11Message;
 
 @FunctionalInterface
 public interface IGroupMessageListener {

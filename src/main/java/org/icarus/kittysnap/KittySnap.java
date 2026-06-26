@@ -8,7 +8,7 @@ import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
 import org.icarus.kittysnap.chat.ChatToGroupForwarder;
 import org.icarus.kittysnap.chat.QQToGameBroadcaster;
 import org.icarus.kittysnap.command.KittySnapCommand;
-import org.icarus.kittysnap.command.KittySnapCommand.LoggingGroupListener;
+import org.icarus.kittysnap.utils.listeners.LoggingGroupListener;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.database.DatabaseManager;
 import org.icarus.kittysnap.napcat.handler.SegmentHandler;

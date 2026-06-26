@@ -2,9 +2,9 @@ package org.icarus.kittysnap.napcat.handler.handlers;
 
 import org.icarus.kittysnap.config.MessagesConfig;
 import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
-import org.icarus.kittysnap.napcat.onebotapi.OB11MessageAt;
+import org.icarus.kittysnap.napcat.onebot.OB11MessageAt;
 
-import static org.icarus.kittysnap.napcat.handler.Escaper.escape;
+import static org.icarus.kittysnap.utils.Escaper.escape;
 
 public class AtFormatter {
     public static String handleAt(NapcatWebSocketClient napcatClient, OB11MessageAt at, long groupId, MessagesConfig m) {

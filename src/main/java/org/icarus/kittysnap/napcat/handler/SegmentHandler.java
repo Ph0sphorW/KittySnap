@@ -3,18 +3,18 @@ package org.icarus.kittysnap.napcat.handler;
 import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.config.MessagesConfig;
 import org.icarus.kittysnap.database.DatabaseManager;
-import org.icarus.kittysnap.napcat.handler.handlers.BuildResult;
+import org.icarus.kittysnap.utils.BuildResult;
 import org.icarus.kittysnap.napcat.handler.handlers.AtFormatter;
 import org.icarus.kittysnap.napcat.handler.handlers.CardHandler;
 import org.icarus.kittysnap.napcat.handler.handlers.image.ImageHandler;
 import org.icarus.kittysnap.napcat.handler.handlers.QQFaceMapper;
 import org.icarus.kittysnap.napcat.handler.handlers.ReplyFormatter;
 import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
-import org.icarus.kittysnap.napcat.onebotapi.*;
+import org.icarus.kittysnap.napcat.onebot.*;
 
 import java.util.List;
 
-import static org.icarus.kittysnap.napcat.handler.Escaper.escape;
+import static org.icarus.kittysnap.utils.Escaper.escape;
 
 public record SegmentHandler(NapcatWebSocketClient napcatClient, ConfigurationManager cfg) {
 
@@ -31,7 +31,6 @@ public record SegmentHandler(NapcatWebSocketClient napcatClient, ConfigurationMa
             case OB11MessageJson json -> CardHandler.handleJson(json, config);
             case OB11MessageMarkdown ignored -> config.getSegment().getMarkdownText();
             case OB11MessageUnknown ignored -> config.getSegment().getUnknownText();
-            // 新版 QQ 对原生转发消息不再附加 content，因此无法梗概
             case OB11MessageForward ignored -> config.getSegment().getForwardText();
             default -> "";
         };

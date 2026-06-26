@@ -2,6 +2,7 @@ package org.icarus.kittysnap.database;
 
 import lombok.Getter;
 import org.icarus.kittysnap.config.ConfigurationManager;
+import org.icarus.kittysnap.utils.OriginalMessage;
 
 import java.util.function.BiConsumer;
 
@@ -48,7 +49,7 @@ public class DatabaseManager {
     /**
      * 按 message_id 查询已存储的原始消息
      */
-    public MessageRepository.OriginalMessage queryOriginalMessage(long groupId, long messageId) {
+    public OriginalMessage queryOriginalMessage(long groupId, long messageId) {
         return messageRepo.queryByMessageId(groupId, messageId);
     }
 }
