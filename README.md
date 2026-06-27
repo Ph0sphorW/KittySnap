@@ -1,4 +1,5 @@
 # KittySnap
+[English] / [[中文](./README-zh.md)]  
 _Forwarding message between Napcat and Minecraft!_  
 KittySnap is a plugin that bridges QQ Group messaging and in-game chatting.  
 
@@ -31,7 +32,7 @@ git clone https://github.com/Ph0sphorW/KittySnap/
 ~~What's that?~~
 
 ## License
-TODO
+See [license](./LICENSE)
 
 ## Thanks
 [@XIAYM-gh](https://github.com/XIAYM-gh): Reorganized file structure  

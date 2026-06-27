@@ -97,6 +97,8 @@ public class KittySnapCommand implements TabExecutor {
         // 注册监听
         plugin.getNapcatClient().addGroup(groupId, new LoggingGroupListener(plugin));
 
+        // 调一次 reload，防止配置不更新
+        plugin.reload();
         sender.sendMessage(cfg.prefixed("command.addgroup-done", groupId));
         return true;
     }
@@ -120,6 +122,8 @@ public class KittySnapCommand implements TabExecutor {
         // 从运行时移除
         plugin.getNapcatClient().removeGroup(groupId);
 
+        // 调一次 reload，防止配置不更新
+        plugin.reload();
         sender.sendMessage(cfg.prefixed("command.delgroup-done", groupId));
         return true;
     }
