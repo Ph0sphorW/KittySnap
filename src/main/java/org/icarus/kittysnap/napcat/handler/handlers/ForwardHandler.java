@@ -25,7 +25,7 @@ public class ForwardHandler {
         String id = forwardedMessage.getDataString("id");
         if (id == null || id.isEmpty()) return messages.getSegment().getForwardText();
 
-        JSONArray msgs = (JSONArray) forwardedMessage.getData().get("content");
+        JSONArray msgs = forwardedMessage.getMessages();
         if (msgs == null || msgs.isEmpty()) return messages.getSegment().getForwardText();
 
         // 构建 hover 预览：发送者昵称: 内容摘要（每行一条）

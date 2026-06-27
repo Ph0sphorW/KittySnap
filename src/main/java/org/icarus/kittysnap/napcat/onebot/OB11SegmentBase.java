@@ -48,6 +48,7 @@ public abstract class OB11SegmentBase implements OB11Segment {
             case "json" -> new OB11MessageJson(data);
             case "markdown" -> new OB11MessageMarkdown(data);
             case "forward" -> new OB11MessageForward(data);
+            case "file" -> new OB11MessageFile(data);
             default -> new OB11MessageUnknown(type, data);
         };
     }

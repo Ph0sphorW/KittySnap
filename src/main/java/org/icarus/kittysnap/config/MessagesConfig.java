@@ -217,6 +217,7 @@ public final class MessagesConfig {
         public String markdownText = "[Markdown消息]";
         public String unknownText = "[其它消息]";
         public String forwardText = "[<#0099FF>转发消息</#0099FF>]";
+        public String fileText = "[<#FF99FF>文件 %s</#FF99FF>]";
         public String atAll = "<#0099CC>@全体成员</#0099CC>";
         public String atPrefix = "@";
         public String replyFormat = "<gray>[回复 </gray><#99FF99>%s</#99FF99><gray>: %s</gray><gray>]</gray>";

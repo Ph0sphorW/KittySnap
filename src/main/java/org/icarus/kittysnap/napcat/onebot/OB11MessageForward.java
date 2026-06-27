@@ -1,5 +1,7 @@
 package org.icarus.kittysnap.napcat.onebot;
 
+import com.alibaba.fastjson2.JSONArray;
+
 import java.util.Map;
 
 /**
@@ -18,5 +20,12 @@ public class OB11MessageForward extends OB11SegmentBase {
 
     public OB11MessageForward(Map<String, Object> data) {
         super(TYPE, data);
+    }
+
+    /**
+     * 获取转发消息段
+     */
+    public JSONArray getMessages(){
+        return (JSONArray) this.getData().get("content");
     }
 }

@@ -4,13 +4,9 @@ import org.icarus.kittysnap.config.ConfigurationManager;
 import org.icarus.kittysnap.config.MessagesConfig;
 import org.icarus.kittysnap.config.KittySnapConfig;
 import org.icarus.kittysnap.database.DatabaseManager;
+import org.icarus.kittysnap.napcat.handler.handlers.*;
 import org.icarus.kittysnap.utils.BuildResult;
-import org.icarus.kittysnap.napcat.handler.handlers.AtFormatter;
-import org.icarus.kittysnap.napcat.handler.handlers.CardHandler;
-import org.icarus.kittysnap.napcat.handler.handlers.ForwardHandler;
 import org.icarus.kittysnap.napcat.handler.handlers.image.ImageHandler;
-import org.icarus.kittysnap.napcat.handler.handlers.QQFaceMapper;
-import org.icarus.kittysnap.napcat.handler.handlers.ReplyFormatter;
 import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
 import org.icarus.kittysnap.napcat.onebot.*;
 
@@ -55,6 +51,7 @@ public record SegmentHandler(NapcatWebSocketClient napcatClient, ConfigurationMa
             case OB11MessageForward forward -> inForwarding ?
                     messages.getSegment().getForwardText() :
                     ForwardHandler.handleForward(forward, groupId, this, messages, snapConfig);
+            case OB11MessageFile file -> FileHandler.fileHandler(file, messages);
             case OB11MessageMarkdown ignored -> messages.getSegment().getMarkdownText();
             case OB11MessageUnknown ignored -> messages.getSegment().getUnknownText();
             default -> "";
