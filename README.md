@@ -34,5 +34,5 @@ git clone https://github.com/Ph0sphorW/KittySnap/
 TODO
 
 ## Thanks
-@XIAYM-gh: Reorganized file structure  
-@HaHaWTH: Refactored image handling part
+[@XIAYM-gh](https://github.com/XIAYM-gh): Reorganized file structure  
+[@HaHaWTH](https://github.com/HaHaWTH): Refactored image handling part
