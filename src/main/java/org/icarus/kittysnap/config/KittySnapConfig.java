@@ -77,6 +77,22 @@ public final class KittySnapConfig {
 
         @Comment("是否解析图片；默认开启")
         public Boolean parseImage = true;
+
+        @Comment({"消息批处理 — 将多条游戏聊天合并为一条发送", "减少 WebSocket 请求频率，降低风控风险"})
+        public Batching batching = new Batching();
+
+        @Configuration
+        @Getter
+        public static final class Batching {
+            @Comment("是否启用批处理")
+            public boolean enabled = true;
+
+            @Comment("批处理最大消息数，达到此数量后立即发送")
+            public int maxBatchSize = 15;
+
+            @Comment("批处理最大等待时间（秒），超时后自动发送")
+            public int maxBatchInterval = 5;
+        }
     }
 
     // -------------------- 数据库 --------------------

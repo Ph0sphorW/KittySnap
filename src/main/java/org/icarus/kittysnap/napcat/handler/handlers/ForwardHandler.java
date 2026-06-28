@@ -7,7 +7,7 @@ import org.icarus.kittysnap.config.MessagesConfig;
 import org.icarus.kittysnap.napcat.handler.SegmentHandler;
 import org.icarus.kittysnap.napcat.onebot.OB11MessageForward;
 import org.icarus.kittysnap.napcat.onebot.OB11Segment;
-import org.icarus.kittysnap.napcat.onebot.OB11SegmentBase;
+import org.icarus.kittysnap.napcat.onebot.OB11Message;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class ForwardHandler {
      */
     private static String renderContent(JSONArray content, long groupId, SegmentHandler handler) {
         if (content == null || content.isEmpty()) return "";
-        List<OB11Segment> segments = OB11SegmentBase.fromJSONArray(content);
+        List<OB11Segment> segments = OB11Message.getOB11Segments(content);
         StringBuilder sb = new StringBuilder();
         for (OB11Segment s : segments) {
             sb.append(handler.handle(s, groupId, true));

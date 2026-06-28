@@ -46,28 +46,22 @@ class WebsocketListener implements WebSocket.Listener {
     @Override
     public CompletionStage<?> onText(WebSocket ws, CharSequence data, boolean last) {
         buf.append(data);
-        if (!last) {
-            ws.request(1);
-            return CompletableFuture.completedFuture(null);
-        }
+        if (last) {
+            String full = buf.toString();
+            buf.setLength(0);
 
-        String full = buf.toString();
-        buf.setLength(0);
+            if (!routeEcho(full)) {
+                String preview = full.length() > truncateLen ? full.substring(0, truncateLen) + "..." : full;
+                plugin.getLogger().fine("[WS-RECV] ← " + preview);
 
-        if (routeEcho(full)) {
-            ws.request(1);
-            return CompletableFuture.completedFuture(null);
-        }
-
-        String preview = full.length() > truncateLen ? full.substring(0, truncateLen) + "..." : full;
-        plugin.getLogger().fine("[WS-RECV] ← " + preview);
-
-        client.ensureExecutor();
-        ExecutorService exec = client.executor;
-        if (exec != null && !exec.isShutdown()) {
-            exec.execute(() -> dispatcher.dispatch(full));
-        } else {
-            plugin.getLogger().warning("[WS-RECV] executor 不可用，消息被丢弃");
+                client.ensureExecutor();
+                ExecutorService exec = client.executor;
+                if (exec != null && !exec.isShutdown()) {
+                    exec.execute(() -> dispatcher.dispatch(full));
+                } else {
+                    plugin.getLogger().warning("[WS-RECV] executor 不可用，消息被丢弃");
+                }
+            }
         }
 
         ws.request(1);

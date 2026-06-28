@@ -19,16 +19,16 @@ public class ConnectionPoolManager {
     @SuppressWarnings("ExtractMethodRecommender")
     boolean init() {
         HikariConfig hk = new HikariConfig();
-        hk.setJdbcUrl(cfg.getDbJdbcUrl());
-        hk.setDriverClassName(cfg.getDbDriverClass());
-        hk.setUsername(cfg.getDbUsername());
-        hk.setPassword(cfg.getDbPassword());
+        hk.setJdbcUrl(cfg.getConfig().getDatabase().getJdbcUrl());
+        hk.setDriverClassName(cfg.getConfig().getDatabase().getDriverClass());
+        hk.setUsername(cfg.getConfig().getDatabase().getUsername());
+        hk.setPassword(cfg.getConfig().getDatabase().getPassword());
         hk.setMaximumPoolSize(cfg.getDbPoolMaxSize());
         hk.setMinimumIdle(cfg.getDbPoolMinIdle());
         hk.setConnectionTimeout(cfg.getDbPoolConnectionTimeout());
         hk.setIdleTimeout(cfg.getDbPoolIdleTimeout());
         hk.setMaxLifetime(cfg.getDbPoolMaxLifetime());
-        hk.setPoolName(cfg.getDbPoolName());
+        hk.setPoolName(cfg.getConfig().getDatabase().getPool().getPoolName());
 
         if (cfg.isDbCachePrepStmts()) {
             hk.addDataSourceProperty("cachePrepStmts", "true");

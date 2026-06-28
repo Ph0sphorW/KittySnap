@@ -21,7 +21,7 @@ public class MessageRepository {
     MessageRepository(ConfigurationManager cfg, ConnectionPoolManager pool) {
         this.cfg = cfg;
         this.pool = pool;
-        this.tableName = cfg.getDbTableName();
+        this.tableName = cfg.getConfig().getDatabase().getTableName();
     }
 
     void setDebugConsumer(BiConsumer<String, Object[]> c) {

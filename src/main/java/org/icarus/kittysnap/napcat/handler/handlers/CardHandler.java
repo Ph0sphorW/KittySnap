@@ -22,6 +22,8 @@ public class CardHandler {
         return "<click:open_url:" + safeUrl + ">" + "<hover:show_text:'<gray>" + config.getSegment().getCardPreviewHover() + hover + "</gray>'>" + config.getSegment().getCardText() + "</hover></click>";
     }
 
+    private static final String[] URL_FIELDS = {"qqdocurl", "url", "jumpUrl", "link", "jump_url"};
+
     /**
      * 从卡片 JSON 字符串中提取第一个可用的链接
      */
@@ -47,7 +49,7 @@ public class CardHandler {
     }
 
     private static String tryPickUrl(JSONObject obj) {
-        for (String field : new String[]{"qqdocurl", "url", "jumpUrl", "link", "jump_url"}) {
+        for (String field : URL_FIELDS) {
             String v = obj.getString(field);
             if (v != null && (v.startsWith("http://") || v.startsWith("https://"))) return v;
         }

@@ -43,17 +43,14 @@ public final class KittySnap extends JavaPlugin {
     public void setDebugMode(boolean debug) {
         this.debugMode = debug;
         if (debug) {
-            var debugConsumer = new BiConsumer<String, Object[]>() {
-                @Override
-                public void accept(String key, Object[] args) {
-                    getLogger().info("[DEBUG] " + configManager.raw(key, args));
-                    Component component = configManager.component(key, args);
-                    Bukkit.getScheduler().runTask(KittySnap.this, () ->
-                        Bukkit.getOnlinePlayers().stream()
-                                .filter(p -> p.hasPermission("kittysnap.admin"))
-                                .forEach(p -> p.sendMessage(component))
-                    );
-                }
+            BiConsumer<String, Object[]> debugConsumer = (key, args) -> {
+                getLogger().info("[DEBUG] " + configManager.raw(key, args));
+                Component component = configManager.component(key, args);
+                Bukkit.getScheduler().runTask(KittySnap.this, () ->
+                    Bukkit.getOnlinePlayers().stream()
+                            .filter(p -> p.hasPermission("kittysnap.admin"))
+                            .forEach(p -> p.sendMessage(component))
+                );
             };
             napcatClient.setDebugConsumer(debugConsumer);
             if (databaseManager != null) {
@@ -75,7 +72,7 @@ public final class KittySnap extends JavaPlugin {
         napcatClient.removeListenersByType(LoggingGroupListener.class);
 
         // 用新配置重新注册
-        var configGroups = configManager.getListenGroups();
+        var configGroups = configManager.getConfig().getGroups();
         if (!configGroups.isEmpty()) {
             napcatClient.addGroups(configGroups, new QQToGameBroadcaster(configManager));
         }
@@ -110,7 +107,7 @@ public final class KittySnap extends JavaPlugin {
             configManager.logWarning("internal.command-register-failed");
         }
 
-        var listenGroups = configManager.getListenGroups();
+        var listenGroups = configManager.getConfig().getGroups();
         if (!listenGroups.isEmpty()) {
             napcatClient.addGroups(listenGroups, new QQToGameBroadcaster(configManager));
         } else {
@@ -119,8 +116,8 @@ public final class KittySnap extends JavaPlugin {
 
         napcatClient.connect();
 
-        if (configManager.isChatForwardEnabled()) {
-            chatForwarder = new ChatToGroupForwarder(napcatClient, configManager);
+        if (configManager.getConfig().getChatForward().isEnabled()) {
+            chatForwarder = new ChatToGroupForwarder(napcatClient, configManager, this);
             getServer().getPluginManager().registerEvents(chatForwarder, this);
             configManager.logInfo("chat-forward.enabled");
         } else {
@@ -130,6 +127,9 @@ public final class KittySnap extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (chatForwarder != null) {
+            chatForwarder.shutdown();
+        }
         if (napcatClient != null) {
             napcatClient.disconnect();
             napcatClient = null;

@@ -11,44 +11,37 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 public class MessageSender {
 
     private final ConfigurationManager cfg;
+    private final NapcatWebSocketClient client;
     private final Queue<PendingMessage> pendingQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls;
-    private final Supplier<Boolean> connected;
-    private final Supplier<WebSocket> webSocket;
-    private final Supplier<ExecutorService> executor;
 
     public MessageSender(ConfigurationManager cfg,
                          ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls,
-                         Supplier<Boolean> connected,
-                         Supplier<WebSocket> webSocket, Supplier<ExecutorService> executor) {
+                         NapcatWebSocketClient client) {
         this.cfg = cfg;
         this.pendingApiCalls = pendingApiCalls;
-        this.connected = connected;
-        this.webSocket = webSocket;
-        this.executor = executor;
+        this.client = client;
     }
 
     /**
      * 发送群消息，未连接则排队
      */
     public void sendGroupMessage(long groupId, String message) {
-        if (connected.get() && webSocket.get() != null) {
-            executor.get().execute(() -> doSend(groupId, message));
+        if (client.connected && client.webSocket != null) {
+            client.executor.execute(() -> doSend(groupId, message));
         } else {
             pendingQueue.add(new PendingMessage(groupId, message));
         }
     }
 
     private void doSend(long groupId, String message) {
-        WebSocket ws = webSocket.get();
-        if (!connected.get() || ws == null) {
+        WebSocket ws = client.webSocket;
+        if (!client.connected || ws == null) {
             pendingQueue.add(new PendingMessage(groupId, message));
             return;
         }
@@ -83,8 +76,8 @@ public class MessageSender {
      * 同步 API 调用等待响应
      */
     public JSONObject sendActionSync(String action, JSONObject params, long timeout) {
-        WebSocket ws = webSocket.get();
-        if (!connected.get() || ws == null) return null;
+        WebSocket ws = client.webSocket;
+        if (!client.connected || ws == null) return null;
         String echo = UUID.randomUUID().toString();
         CompletableFuture<JSONObject> future = new CompletableFuture<>();
         pendingApiCalls.put(echo, future);

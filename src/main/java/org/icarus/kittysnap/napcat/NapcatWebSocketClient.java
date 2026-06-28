@@ -34,7 +34,7 @@ public class NapcatWebSocketClient {
     final ConcurrentHashMap<String, CompletableFuture<JSONObject>> pendingApiCalls = new ConcurrentHashMap<>();
 
     private HttpClient httpClient;
-    private WebSocket webSocket;
+    WebSocket webSocket;
     @Getter
     volatile boolean connected = false;
     private volatile boolean autoReconnect = true;
@@ -47,7 +47,7 @@ public class NapcatWebSocketClient {
         this.cfg = cfg;
         this.listeners = new ListenerManager(cfg);
         this.dispatcher = new MessageDispatcher(plugin, cfg, listeners.entries());
-        this.sender = new MessageSender(cfg, pendingApiCalls, () -> connected, () -> webSocket, () -> executor);
+        this.sender = new MessageSender(cfg, pendingApiCalls, this);
     }
 
     // -------------------- 调试 --------------------
@@ -124,18 +124,18 @@ public class NapcatWebSocketClient {
     private void doConnect() {
         ensureExecutor();
         try {
-            cfg.logInfo("websocket.connecting", cfg.getWsUrl());
+            cfg.logInfo("websocket.connecting", cfg.getConfig().getNapcat().getWsUrl());
             var builder = httpClient.newWebSocketBuilder()
                     .connectTimeout(Duration.ofSeconds(cfg.getNapcatConnectTimeout()));
-            String token = cfg.getNapcatToken();
+            String token = cfg.getConfig().getNapcat().getToken();
             if (token != null && !token.isEmpty()) builder.header("Authorization", "Bearer " + token);
-            builder.buildAsync(URI.create(cfg.getWsUrl()),
+            builder.buildAsync(URI.create(cfg.getConfig().getNapcat().getWsUrl()),
                             new WebsocketListener(this, cfg, plugin, dispatcher, pendingApiCalls))
                     .orTimeout(cfg.getNapcatConnectTimeout(), TimeUnit.SECONDS)
                     .thenAccept(ws -> {
                         this.webSocket = ws;
                         this.connected = true;
-                        cfg.logInfo("websocket.connected", cfg.getWsUrl());
+                        cfg.logInfo("websocket.connected", cfg.getConfig().getNapcat().getWsUrl());
                         sender.flushPending();
                     })
                     .exceptionally(ex -> {

@@ -226,16 +226,8 @@ public class ConfigurationManager {
 
     // -------------------- 代理方法：KittySnapConfig 常用配置 --------------------
 
-    public String getWsUrl() {
-        return config.getNapcat().getWsUrl();
-    }
-
     public int getReconnectDelay() {
         return Math.max(1, config.getNapcat().getReconnectDelay());
-    }
-
-    public List<Long> getListenGroups() {
-        return config.getGroups();
     }
 
     public boolean addListenGroup(long groupId) {
@@ -249,42 +241,6 @@ public class ConfigurationManager {
         boolean removed = config.getGroups().remove(groupId);
         if (removed) saveConfig();
         return removed;
-    }
-
-    public boolean isChatForwardEnabled() {
-        return config.getChatForward().isEnabled();
-    }
-
-    public String getChatForwardFormat() {
-        return config.getChatForward().getFormat();
-    }
-
-    public List<Long> getChatForwardTargetGroups() {
-        return config.getChatForward().getTargetGroups();
-    }
-
-    public String getDbJdbcUrl() {
-        return config.getDatabase().getJdbcUrl();
-    }
-
-    public String getDbDriverClass() {
-        return config.getDatabase().getDriverClass();
-    }
-
-    public String getDbUsername() {
-        return config.getDatabase().getUsername();
-    }
-
-    public String getDbPassword() {
-        return config.getDatabase().getPassword();
-    }
-
-    public String getDbTableName() {
-        return config.getDatabase().getTableName();
-    }
-
-    public String getDbPoolName() {
-        return config.getDatabase().getPool().getPoolName();
     }
 
     public int getDbPoolMaxSize() {
@@ -319,24 +275,13 @@ public class ConfigurationManager {
         return Math.max(512, config.getDatabase().getPool().getPrepStmtCacheSqlLimit());
     }
 
-    // -------------------- Napcat 新配置 --------------------
-
     public int getNapcatDebugTruncateLength() {
         return Math.max(50, config.getNapcat().getDebugTruncateLength());
-    }
-
-    /**
-     * Napcat 连接 Token（可能为空）
-     */
-    public String getNapcatToken() {
-        return config.getNapcat().getToken();
     }
 
     public long getNapcatConnectTimeout() {
         return Math.max(5, config.getNapcat().getConnectTimeout());
     }
-
-    // -------------------- Misc --------------------
 
     public int getNicknameTruncateLength() {
         return Math.max(32, config.getMisc().getNicknameTruncateLength());

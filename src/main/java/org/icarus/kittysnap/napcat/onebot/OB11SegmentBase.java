@@ -1,14 +1,11 @@
 package org.icarus.kittysnap.napcat.onebot;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,17 +48,6 @@ public abstract class OB11SegmentBase implements OB11Segment {
             case "file" -> new OB11MessageFile(data);
             default -> new OB11MessageUnknown(type, data);
         };
-    }
-
-    /** 将 JSONArray 中的段定义批量解析为 OB11Segment 列表 */
-    public static List<OB11Segment> fromJSONArray(JSONArray arr) {
-        if (arr == null || arr.isEmpty()) return Collections.emptyList();
-        List<OB11Segment> list = new ArrayList<>(arr.size());
-        for (int i = 0; i < arr.size(); i++) {
-            OB11SegmentBase seg = fromJSON(arr.getJSONObject(i));
-            if (seg != null) list.add(seg);
-        }
-        return list;
     }
 
     @Override
