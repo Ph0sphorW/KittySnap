@@ -79,8 +79,15 @@ class WebsocketListener implements WebSocket.Listener {
 
     @Override
     public void onError(WebSocket ws, Throwable error) {
+        client.connected = false;
+        // 清理 pending API 调用，避免 future 永不过期
+        for (var entry : pendingApiCalls.entrySet()) {
+            entry.getValue().completeExceptionally(error);
+        }
+        pendingApiCalls.clear();
         cfg.logWarning("websocket.error", error.getMessage());
-        plugin.getLogger().log(Level.WARNING, "[WS-LISTENER] onError: " + error.getMessage(), error);
+        plugin.getLogger().log(Level.WARNING, "[WS-LISTENER] onError: " + error.getMessage() + " — 已触发重连", error);
+        client.scheduleReconnect();
     }
 
     private boolean routeEcho(String json) {

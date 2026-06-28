@@ -209,7 +209,7 @@ public final class MessagesConfig {
     @Configuration
     @Getter
     public static final class SegmentMessages {
-        public String imageText = "[图片]";
+        public String imageText = "[<#33CCFF>图片</#33CCFF>]";
         public String imageGifText = "[动画表情]";
         public String imagePreviewHover = "<gray>点击预览图片</gray>";
         public String cardText = "[<#FFCCFF>卡片消息</#FFCCFF>]";

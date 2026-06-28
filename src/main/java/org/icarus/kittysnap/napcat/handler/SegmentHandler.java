@@ -6,10 +6,12 @@ import org.icarus.kittysnap.config.KittySnapConfig;
 import org.icarus.kittysnap.database.DatabaseManager;
 import org.icarus.kittysnap.napcat.handler.handlers.*;
 import org.icarus.kittysnap.utils.BuildResult;
+import org.icarus.kittysnap.utils.HandleResult;
 import org.icarus.kittysnap.napcat.handler.handlers.image.ImageHandler;
 import org.icarus.kittysnap.napcat.NapcatWebSocketClient;
 import org.icarus.kittysnap.napcat.onebot.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.icarus.kittysnap.utils.Escaper.escape;
@@ -32,29 +34,29 @@ public record SegmentHandler(NapcatWebSocketClient napcatClient, ConfigurationMa
     /**
      * 将单个段转为展示文本（已有转义处理）
      */
-    public String handle(OB11Segment segment, long groupId, boolean inForwarding) {
+    public HandleResult handle(OB11Segment segment, long groupId, boolean inForwarding) {
         MessagesConfig messages = cfg.getMessages();
         KittySnapConfig snapConfig = cfg.getConfig();
         return switch (segment) {
-            case OB11MessageText t -> escape(t.getText());
-            case OB11MessageAt at -> AtFormatter.handleAt(napcatClient, at, groupId, messages);
+            case OB11MessageText t -> new HandleResult(escape(t.getText()));
+            case OB11MessageAt at -> new HandleResult(AtFormatter.handleAt(napcatClient, at, groupId, messages));
             case OB11MessageFace face -> {
                 String fn = QQFaceMapper.getName(face.getFaceId());
-                yield fn != null ? "[" + fn + "]" : "[表情" + face.getFaceId() + "]";
+                yield new HandleResult(fn != null ? "[" + fn + "]" : "[表情" + face.getFaceId() + "]");
             }
-            case OB11MessageImage img -> inForwarding ?
-                    messages.getSegment().getImageText() :
-                    ImageHandler.handleImage(img, messages, snapConfig);
-            case OB11MessageJson json -> inForwarding ?
-                    messages.getSegment().getCardText() :
-                    CardHandler.handleJson(json, messages);
-            case OB11MessageForward forward -> inForwarding ?
-                    messages.getSegment().getForwardText() :
-                    ForwardHandler.handleForward(forward, groupId, this, messages, snapConfig);
-            case OB11MessageFile file -> FileHandler.fileHandler(file, messages);
-            case OB11MessageMarkdown ignored -> messages.getSegment().getMarkdownText();
-            case OB11MessageUnknown ignored -> messages.getSegment().getUnknownText();
-            default -> "";
+            case OB11MessageImage img -> inForwarding
+                    ? new HandleResult(messages.getSegment().getImageText())
+                    : ImageHandler.handleImage(img, cfg);
+            case OB11MessageJson json -> new HandleResult(inForwarding
+                    ? messages.getSegment().getCardText()
+                    : CardHandler.handleJson(json, messages));
+            case OB11MessageForward forward -> new HandleResult(inForwarding
+                    ? messages.getSegment().getForwardText()
+                    : ForwardHandler.handleForward(forward, groupId, this, messages, snapConfig));
+            case OB11MessageFile file -> new HandleResult(FileHandler.fileHandler(file, messages));
+            case OB11MessageMarkdown ignored -> new HandleResult(messages.getSegment().getMarkdownText());
+            case OB11MessageUnknown ignored -> new HandleResult(messages.getSegment().getUnknownText());
+            default -> new HandleResult("");
         };
     }
 

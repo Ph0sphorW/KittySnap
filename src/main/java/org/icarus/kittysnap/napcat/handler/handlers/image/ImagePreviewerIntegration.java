@@ -40,4 +40,18 @@ public class ImagePreviewerIntegration {
                     }
                 });
     }
+
+    /**
+     * 为单个玩家异步加载图片 URL 并显示预览
+     */
+    public static void previewForPlayer(String url, Player player) {
+        if (!available || url == null || url.isEmpty() || player == null) return;
+        if (!player.isOnline()) return;
+        ImageLoader.imageAsData(url)
+                .thenAcceptOnMain(imageData -> {
+                    if (!player.isOnline()) return;
+                    if (ImagePreviewerAPI.getApi().isPreviewRunning(player)) return;
+                    ImagePreviewerAPI.getApi().spawnPreview(player, imageData);
+                });
+    }
 }

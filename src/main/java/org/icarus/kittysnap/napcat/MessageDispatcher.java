@@ -61,6 +61,8 @@ public class MessageDispatcher {
 
             BuildResult result = segmentHandler.buildDisplay(napMsg.getSegments(), groupId, databaseManager);
             String displayContent = result.displayContent();
+            java.util.List<net.kyori.adventure.text.Component> clickComps = result.hasClickComponents()
+                    ? result.clickComponents() : null;
 
             // raw message
             if (databaseManager != null) {
@@ -82,7 +84,7 @@ public class MessageDispatcher {
 
                 org.bukkit.Bukkit.getScheduler().runTask(plugin, () -> {
                     try {
-                        entry.listener().onGroupMessage(napMsg, groupId, userId, displayContent);
+                        entry.listener().onGroupMessage(napMsg, groupId, userId, displayContent, clickComps);
                         cfg.logFine("dispatch.broadcasted", groupId, nickname);
                     } catch (Exception e) {
                         cfg.logWarning("dispatch.listener-error");

@@ -8,7 +8,10 @@ import org.icarus.kittysnap.napcat.handler.SegmentHandler;
 import org.icarus.kittysnap.napcat.onebot.OB11MessageReply;
 import org.icarus.kittysnap.napcat.onebot.OB11Segment;
 import org.icarus.kittysnap.utils.BuildResult;
+import org.icarus.kittysnap.utils.HandleResult;
+import net.kyori.adventure.text.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,9 +36,15 @@ public class ReplyFormatter {
                                     DatabaseManager db, SegmentHandler handler, MessagesConfig config, KittySnapConfig snapConfig) {
         long replyId = extractReplyId(segments);
         StringBuilder sb = new StringBuilder();
+        List<Component> clickComponents = null;
         for (var seg : segments) {
             if (!(seg instanceof OB11MessageReply)) {
-                sb.append(handler.handle(seg, groupId, false));
+                HandleResult r = handler.handle(seg, groupId, false);
+                sb.append(r.text());
+                if (r.clickComponents() != null) {
+                    if (clickComponents == null) clickComponents = new ArrayList<>();
+                    clickComponents.addAll(r.clickComponents());
+                }
             }
         }
         String content = sb.toString().trim();
@@ -43,7 +52,7 @@ public class ReplyFormatter {
         if (replyId > 0 && db != null) {
             content = lookupReplyPrefix(replyId, groupId, db, config, snapConfig) + " " + content;
         }
-        return new BuildResult(replyId, content);
+        return new BuildResult(replyId, content, clickComponents);
     }
 
     private static String lookupReplyPrefix(long replyMessageId,

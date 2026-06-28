@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
- * 消息批处理器 — 将多条消息积压后合并为一批发送。
+ * 消息批处理器
  * <p>
  * 行为：
  * <ul>
@@ -32,9 +32,9 @@ public class MessageBatcher implements AutoCloseable {
     private int taskId = -1;
 
     /**
-     * @param plugin          Bukkit 插件实例（用于调度器）
+     * @param plugin          用于调度
      * @param maxBatchSize    批次最大条数
-     * @param maxIntervalSec  批次最大等待时间（秒）
+     * @param maxIntervalSec  批次最大等待时间
      * @param flushHandler    刷出回调，接收一批消息
      */
     public MessageBatcher(JavaPlugin plugin, int maxBatchSize, int maxIntervalSec,
@@ -46,8 +46,9 @@ public class MessageBatcher implements AutoCloseable {
     }
 
     /**
-     * 添加一条消息到队列。
-     * 若队列为空则启动计时器；若队列已满则立即刷出。
+     * 添加一条消息到队列
+     * 若队列为空则启动计时器
+     * 若队列已满则立即刷出
      */
     public void add(String message) {
         queue.add(message);
@@ -69,7 +70,7 @@ public class MessageBatcher implements AutoCloseable {
     }
 
     /**
-     * 立即刷出所有积压消息并取消计时器。
+     * 刷出所有积压消息并取消计时器
      */
     public void flush() {
         List<String> batch = new ArrayList<>();
@@ -100,7 +101,7 @@ public class MessageBatcher implements AutoCloseable {
     }
 
     /**
-     * 清空队列并取消计时器，不做刷出。
+     * 清空队列并取消计时器
      */
     public void clear() {
         lock.lock();

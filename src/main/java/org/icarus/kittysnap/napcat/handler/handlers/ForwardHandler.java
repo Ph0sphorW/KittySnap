@@ -61,7 +61,7 @@ public class ForwardHandler {
         List<OB11Segment> segments = OB11Message.getOB11Segments(content);
         StringBuilder sb = new StringBuilder();
         for (OB11Segment s : segments) {
-            sb.append(handler.handle(s, groupId, true));
+            sb.append(handler.handle(s, groupId, true).text());
         }
         return sb.toString().trim();
     }
