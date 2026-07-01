@@ -108,7 +108,7 @@ public final class MessagesConfig {
     @Configuration
     @Getter
     public static final class CommandMessages {
-        public String noPermission = "<#FF9999>你没有权限使用此命令";
+        public String noPermission = "<#FF9999>你没有权限使用此命令。";
         public String unknownSubcommand = "<#FF9999>未知子命令: %s";
         public String usageHeader = "<gold>===== KittySnap 命令帮助 =====";
         public String usageFooter = "<gold>------------------------------";
@@ -123,15 +123,15 @@ public final class MessagesConfig {
         public String reconnectDone = "<#99FF99>正在重新连接 Napcat WebSocket...";
         public String reconnectDesc = "重连 Napcat";
         public String sendUsage = "<#FF9999>用法: /kittysnap send 群号 消息";
-        public String sendNotMonitored = "<#FF9999>群 %d 不在监听列表中，无法发送";
-        public String sendConnecting = "<#FF9999>WebSocket 未连接，消息待连接后发送";
-        public String sendDone = "<#99FF99>已向群 %d 发送消息";
-        public String sendDesc = "向指定监听群发送消息";
-        public String debugToggledOn = "<#99FF99>调试模式已开启，技术信息将输出到后台和你的聊天框";
-        public String debugToggledOff = "<#FFFF99>调试模式已关闭";
-        public String debugDesc = "切换调试模式";
-        public String reloadDone = "<#99FF99>配置文件与语言文件已重载";
-        public String reloadDesc = "重载配置文件与语言文件";
+        public String sendNotMonitored = "<#FF9999>群 %d 不在监听列表中，无法发送。";
+        public String sendConnecting = "<#FF9999>WebSocket 未连接，消息待连接后发送。";
+        public String sendDone = "<#99FF99>已向群 %d 发送消息。";
+        public String sendDesc = "向指定监听群发送消息。";
+        public String debugToggledOn = "<#99FF99>调试模式已开启，技术信息将输出到后台和你的聊天框。";
+        public String debugToggledOff = "<#FFFF99>调试模式已关闭。";
+        public String debugDesc = "切换调试模式。";
+        public String reloadDone = "<#99FF99>配置文件与语言文件已重载。";
+        public String reloadDesc = "重载配置文件与语言文件。";
     }
 
     // ==================== 数据库 ====================
