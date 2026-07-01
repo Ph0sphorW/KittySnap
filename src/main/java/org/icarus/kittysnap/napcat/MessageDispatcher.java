@@ -64,13 +64,6 @@ public class MessageDispatcher {
             java.util.List<net.kyori.adventure.text.Component> clickComps = result.hasClickComponents()
                     ? result.clickComponents() : null;
 
-            // raw message
-            if (databaseManager != null) {
-                String nick = napMsg.getSender() != null ? napMsg.getSender().getDisplayName() : "";
-                String raw = napMsg.getRawMessage() != null ? napMsg.getRawMessage() : "";
-                databaseManager.insertGroupMessage(groupId, napMsg.getSenderId(), nick, raw, napMsg.getMessageId(), napMsg.getMessageSeq(), napMsg.getTime());
-            }
-
             // 下发
             boolean handled = false;
             for (GroupEntry entry : groupListeners) {
@@ -91,6 +84,13 @@ public class MessageDispatcher {
                         plugin.getLogger().log(Level.WARNING, "", e);
                     }
                 });
+            }
+
+            // 仅监听群存储原始消息（供回复引用）
+            if (handled && databaseManager != null) {
+                String nick = napMsg.getSender() != null ? napMsg.getSender().getDisplayName() : "";
+                String raw = napMsg.getRawMessage() != null ? napMsg.getRawMessage() : "";
+                databaseManager.insertGroupMessage(groupId, napMsg.getSenderId(), nick, raw, napMsg.getMessageId(), napMsg.getMessageSeq(), napMsg.getTime());
             }
 
             if (!handled) {

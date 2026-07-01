@@ -24,16 +24,16 @@ public class DatabaseManager {
      */
     @SuppressWarnings("UnusedReturnValue")
     public boolean init() {
-        cfg.logInfo("database.initializing");
+        cfg.logFine("database.initializing");
         if (!pool.init()) return false;
         messageRepo.createTable();
-        cfg.logInfo("database.initialized");
+        cfg.logFine("database.initialized");
         return true;
     }
 
     public void shutdown() {
         pool.shutdown();
-        cfg.logInfo("database.shutdown");
+        cfg.logFine("database.shutdown");
     }
 
     public void setDebugConsumer(BiConsumer<String, Object[]> consumer) {

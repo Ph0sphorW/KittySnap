@@ -81,6 +81,9 @@ public final class KittySnapConfig {
         @Comment({"消息批处理 — 将多条游戏聊天合并为一条发送", "减少 WebSocket 请求频率，降低风控风险"})
         public Batching batching = new Batching();
 
+        @Comment({"游戏聊天转发前缀过滤", "仅当消息以此前缀开头时才转发（如 \"qq\"）", "留空表示不过滤，转发所有消息"})
+        public String chatPrefix = "qq";
+
         @Configuration
         @Getter
         public static final class Batching {

@@ -20,7 +20,7 @@ public class ListenerManager {
 
     public void add(long groupId, IGroupMessageListener listener) {
         groupListeners.add(new GroupEntry(groupId, listener));
-        cfg.logInfo("group.listener-added", groupId);
+        cfg.logFine("group.listener-added", groupId);
     }
 
     public void addAll(Collection<Long> groupIds, IGroupMessageListener listener) {
@@ -29,7 +29,7 @@ public class ListenerManager {
 
     public boolean remove(long groupId) {
         boolean r = groupListeners.removeIf(e -> e.groupId() == groupId);
-        if (r) cfg.logInfo("group.listener-removed", groupId);
+        if (r) cfg.logFine("group.listener-removed", groupId);
         return r;
     }
 

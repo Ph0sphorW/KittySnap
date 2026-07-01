@@ -118,13 +118,13 @@ public class NapcatWebSocketClient {
         } catch (Exception ignored) {
         }
         if (executor != null) executor.shutdownNow();
-        cfg.logInfo("websocket.disconnected");
+        cfg.logFine("websocket.disconnected");
     }
 
     private void doConnect() {
         ensureExecutor();
         try {
-            cfg.logInfo("websocket.connecting", cfg.getConfig().getNapcat().getWsUrl());
+            cfg.logFine("websocket.connecting", cfg.getConfig().getNapcat().getWsUrl());
             var builder = httpClient.newWebSocketBuilder()
                     .connectTimeout(Duration.ofSeconds(cfg.getNapcatConnectTimeout()));
             String token = cfg.getConfig().getNapcat().getToken();
@@ -135,7 +135,7 @@ public class NapcatWebSocketClient {
                     .thenAccept(ws -> {
                         this.webSocket = ws;
                         this.connected = true;
-                        cfg.logInfo("websocket.connected", cfg.getConfig().getNapcat().getWsUrl());
+                        cfg.logFine("websocket.connected", cfg.getConfig().getNapcat().getWsUrl());
                         sender.flushPending();
                     })
                     .exceptionally(ex -> {
@@ -154,7 +154,7 @@ public class NapcatWebSocketClient {
     void scheduleReconnect() {
         if (!autoReconnect || !plugin.isEnabled() || reconnectScheduled) return;
         reconnectScheduled = true;
-        cfg.logInfo("websocket.reconnecting", cfg.getReconnectDelay());
+        cfg.logFine("websocket.reconnecting", cfg.getReconnectDelay());
         reconnectTaskId = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
             reconnectScheduled = false;
             reconnectTaskId = -1;

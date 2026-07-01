@@ -55,10 +55,19 @@ public class ChatToGroupForwarder implements Listener {
 
         Player player = event.getPlayer();
         String format = cfg.getConfig().getChatForward().getFormat();
+        String prefix = cfg.getConfig().getChatForward().getChatPrefix();
 
         // Component 转纯文本格式化
         String displayName = PLAIN.serialize(player.displayName());
         String message = PLAIN.serialize(event.message());
+
+        // 仅匹配前缀的消息才转发
+        if (!prefix.isEmpty()) {
+            if (!message.startsWith(prefix)) return;
+            message = message.substring(prefix.length()).trim();
+            if (message.isEmpty()) return;
+        }
+
         String forwardText = String.format(format, displayName, message);
 
         if (batcher != null) {

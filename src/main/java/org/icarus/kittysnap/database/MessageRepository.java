@@ -54,7 +54,7 @@ public class MessageRepository {
         try (Connection conn = pool.getConnection(); Statement st = conn.createStatement()) {
             st.execute(sql);
             st.execute(idx);
-            cfg.logInfo("database.table-created", tableName);
+            cfg.logFine("database.table-created", tableName);
         } catch (SQLException e) {
             cfg.logSevere("database.table-create-failed", e);
         }
@@ -91,7 +91,7 @@ public class MessageRepository {
                 if (rs.next()) id = rs.getLong(1);
             }
 
-            cfg.logInfo("database.insert-message", groupId, userId, id);
+            cfg.logFine("database.insert-message", groupId, userId, id);
             debug("debug-db-insert", groupId, userId, rawMessage, id, elapsed);
 
             var stats = pool.getPoolStats();
