@@ -38,7 +38,7 @@ dependencies {
     compileOnly("maven.modrinth:image-previewer:2.1.0")
 
     implementation("com.alibaba.fastjson2:fastjson2:2.0.53")
-    implementation("de.exlll:configlib-paper:4.8.1")
+    implementation("de.exlll:configlib-yaml:4.8.1")
     implementation("com.zaxxer:HikariCP:6.2.1")
     implementation("com.h2database:h2:2.3.232")
 }
